@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  next_id: 1
+  previous_id: 1
+  name: MyString
+  state_str: MyString
+  state_int: 1
+  user_id: 1
+  assignee_user_id: 
+
+two:
+  next_id: 1
+  previous_id: 1
+  name: MyString
+  state_str: MyString
+  state_int: 1
+  user_id: 1
+  assignee_user_id: 
