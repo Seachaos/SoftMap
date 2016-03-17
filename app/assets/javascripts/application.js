@@ -18,3 +18,41 @@
 //= require react_ujs
 
 //= require_tree .
+
+
+function apiCall(url, data, onSuccess, sender){
+	$.post({
+		url: url,
+		data : data,
+		dataType: 'json',
+		success : function(resp){
+			if(resp.status!=0){
+				message(resp.emsg);
+				return;
+			}
+			if(sender){
+				onSuccess.bind(sender, resp)();
+				return;
+			}
+			onSuccess(resp);
+		}, error : function(){
+			message("some thing error.")
+		}
+	})	
+}
+
+
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
+
+function uuid(){
+	return guid();
+}
+

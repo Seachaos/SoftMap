@@ -6,7 +6,17 @@ class ApplicationController < ActionController::Base
 
 protected
 	def goto_login_page
-	redirect_to :controller=>'user', :action=>'login'
+    respond_to do |format|
+      format.html {
+        redirect_to :controller=>'user', :action=>'login'
+      }
+      format.json {
+        render :json => {
+          :status => 1,
+          :emsg => 'Please login first'
+        }
+      }
+    end
   end
 
   def check_login

@@ -11,18 +11,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160316155543) do
+ActiveRecord::Schema.define(version: 20160317164132) do
+
+  create_table "error_codes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "task_links", force: :cascade do |t|
-    t.integer  "next_id"
-    t.integer  "previous_id"
+    t.integer  "next_id",          default: 0
+    t.integer  "previous_id",      default: 0
     t.string   "name"
+    t.string   "description"
     t.string   "state_str"
     t.integer  "state_int"
     t.integer  "user_id"
     t.integer  "assignee_user_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
   end
 
   create_table "users", force: :cascade do |t|
