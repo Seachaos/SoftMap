@@ -98,12 +98,24 @@ section{
     border:1px #CCC solid;min-height:300px;
     background:#F5F5F5;
 
-    .task_link_box{
-        min-height:100px;
-        min-width:100px;
-        background:#FFF;
-        margin:6px; padding:6px;
-        border:1px #FE0 solid;
-        float:left;
+    .svg_task_link{
+        height:100px;
+        width:100px;
+        stroke-width:1px;
+        stroke:rgb(0,0,0);
+        fill:rgb(255, 255,255);
+    }
+    .svg_move_tag_g{
+        cursor: move;
+        font-size : 15px;
+        fill:rgb(64,64,64);
+
+        .svg_move_tag{
+            fill:rgb(255, 245, 15);
+            stroke-width:1px;
+            stroke:rgb(0,0,0);
+            width : 48px;
+            height : 20px;
+        }
     }
 }
