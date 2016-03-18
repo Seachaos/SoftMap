@@ -4,15 +4,54 @@ function message(msg){
 	alert(msg);
 }
 
+function showNewTaskDialog(opt){
+	var opt = opt || {};
+
+	$.facebox('<div id="create_task_dialog" />');
+	ReactDOM.render(
+		React.createElement(CreateTaskDialog,
+			opt),
+		document.getElementById('create_task_dialog'));
+}
+
 var taskPanel = false;
 var panelHandleMouseMove = false;
 
 var TaskLink = React.createClass({
 	getInitialState : function(){
+		this.loadTask()
 		return {
 			x : this.props.x || 10,
-			y : this.props.y || 10
+			y : this.props.y || 10,
+			height : this.props.height || 100,
+			previousData : this.props.previousData || false
 		}
+	},
+	updatePreviousData : function(data){
+		console.log('CALL');
+		this.setState({ previousData: data });
+	},
+	loadTask : function(){
+		apiCall('api/get_task.json',
+		{
+			previous_id : this.props.data.id
+		}, function(resp){
+			var previousData = this.props.data;
+			var task_array = resp.tasks.map(function(task){
+				return React.createElement(TaskLink, {
+					data:task,
+					x: task.x,
+					y: task.y,
+					key: 'task_link_id_' + task.id,
+					previousData : previousData
+				});
+			});
+			if(task_array.length>0){
+				this.setState({
+					sub_tasks : task_array
+				});
+			}
+		}, this);
 	},
 	handleMouseMove : function(e){
 		if(! this.inDragMode){
@@ -46,6 +85,13 @@ var TaskLink = React.createClass({
 	handleMouseOut : function(e){
 		panelHandleMouseMove = this.handleMouseMove;
 	},
+	handleClickNewSubTask : function(e){
+		var data = this.props.data;
+		showNewTaskDialog({
+			previous_id : data.id,
+			previous_name : data.name
+		});
+	},
 	savePosition : function(){
 		savePosition = false;
 		apiCall('api/save_position', {
@@ -61,10 +107,26 @@ var TaskLink = React.createClass({
 			this.savePosition();
 		}
 		var _x_add_tag = 72;
-		return React.createElement('g', {
+
+		// prepare link line
+		var link_line = null;
+		if(this.state.previousData){ // if has previous data
+			var previousData = this.state.previousData;
+			link_line = React.createElement('line', {
+				className : 'svg_link_line',
+				x1 : 100,
+				y1 : 60,
+				x2 : this.state.x,
+				y2 : this.state.y + this.state.height / 2
+			});
+		}		
+
+		// return render
+		var box =  React.createElement('g', {
 				className : 'task_link_box',
 				transform : transform,
 			},
+			this.state.sub_tasks,
 			// ---- content ----
 			// background
 			React.createElement('rect', {
@@ -90,7 +152,8 @@ var TaskLink = React.createClass({
 			),
 			// new tag
 			React.createElement('g',{
-					className : 'svg_new_tag_g'
+					className : 'svg_new_tag_g',
+					onClick : this.handleClickNewSubTask
 				},
 				React.createElement('rect', {
 					className : 'svg_add_tag',
@@ -101,6 +164,9 @@ var TaskLink = React.createClass({
 			)
 			// ------ end ----
 		);
+		return React.createElement('g', null,
+			link_line,
+			box);
 	}
 });
 
@@ -110,8 +176,17 @@ var TaskPanel = React.createClass({
 		{
 			previous_id : 0
 		}, function(resp){
+			var task_array = resp.tasks.map(function(task){
+				return React.createElement(TaskLink, {
+					data:task,
+					x: task.x,
+					y: task.y,
+					key: 'task_link_id_' + task.id
+				});
+			});
 			this.setState({
 				tasks : resp.tasks,
+				task_array : task_array,
 				loading : false
 			});
 		}, this);
@@ -138,25 +213,15 @@ var TaskPanel = React.createClass({
 			this.loadTask();
 			return React.createElement('h1', null, 'Loading');
 		}
-		var y = 0;
-		var task_array = this.state.tasks.map(function(task){
-			y += 70;
-			return React.createElement(TaskLink, {
-				data:task,
-				x: task.x,
-				y: task.y,
-				key: 'task_link_id_' + task.id
-			});
-		});
 		return React.createElement('svg', {
 			onMouseMove : this.handleMouseMove,
 			width : panel_width,
 			height : panel_height
-		}, task_array);
+		}, this.state.task_array);
 	}
 });
 
-var CreateTask = React.createClass({
+var CreateTaskDialog = React.createClass({
 	saveTask : function(){
 		var data = {};
 		for(key in this.state){
@@ -172,17 +237,28 @@ var CreateTask = React.createClass({
 		});
 	},
 	getInitialState : function(){
+		task_id = this.props.task_id || 0
+		previous_id = this.props.previous_id || 0
 		return {
 			'name':'',
-			'description':''
+			'description':'',
+			'task_id': task_id,
+			'previous_id': previous_id
 		}
 	},
 	render : function(){
+		var title = null;
+		if(this.props.previous_name){
+			title = React.createElement('h3', {}, 'Sub task in :' + this.props.previous_name);
+		}
 		return React.createElement('div', {
 
 		},
+		title,
 		createInput('TaskName：', 'name', this),
 		createInput('Description：', 'description', this),
+		React.createElement('input', {type:'hidden', name: 'task_id', value: this.state.task_id}),
+		React.createElement('input', {type:'hidden', name: 'previous_id', value: this.state.previous_id}),
 		React.createElement('div', {
 			className:'button',
 			onClick : this.saveTask
@@ -192,8 +268,7 @@ var CreateTask = React.createClass({
 
 var NewTask = React.createClass({
 	handleClick: function(){
-		$.facebox('<div id="create_task_dialog" />');
-		RenderCreateTask(document.getElementById('create_task_dialog'));
+		showNewTaskDialog();
 	},
 	render: function(){
 		return React.createElement('span',{
@@ -221,7 +296,4 @@ function createInput(label, name, sender){
 				value: sender.state[name]
 			}))
 		)
-}
-function RenderCreateTask(dom){
-	ReactDOM.render(React.createElement(CreateTask), dom);
 }

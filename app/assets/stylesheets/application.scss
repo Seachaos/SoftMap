@@ -103,6 +103,11 @@ section{
     border:1px #CCC solid;min-height:300px;
     background:#F5F5F5;
 
+    .svg_link_line{
+        stroke:rgb(0,0,0);
+        stroke-width:1;
+    }
+
     .svg_task_link{
         height:100px;
         width:100px;

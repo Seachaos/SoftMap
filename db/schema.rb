@@ -21,8 +21,10 @@ ActiveRecord::Schema.define(version: 20160317164132) do
   create_table "task_links", force: :cascade do |t|
     t.integer  "next_id",          default: 0
     t.integer  "previous_id",      default: 0
-    t.integer  "x",                default: 10
+    t.integer  "x",                default: 160
     t.integer  "y",                default: 40
+    t.integer  "width",            default: 100
+    t.integer  "height",           default: 100
     t.integer  "board_id",         default: 10
     t.string   "name"
     t.string   "description"
@@ -30,9 +32,16 @@ ActiveRecord::Schema.define(version: 20160317164132) do
     t.integer  "state_int"
     t.integer  "user_id"
     t.integer  "assignee_user_id"
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
   end
+
+  add_index "task_links", ["assignee_user_id"], name: "index_task_links_on_assignee_user_id"
+  add_index "task_links", ["board_id"], name: "index_task_links_on_board_id"
+  add_index "task_links", ["next_id"], name: "index_task_links_on_next_id"
+  add_index "task_links", ["previous_id"], name: "index_task_links_on_previous_id"
+  add_index "task_links", ["state_int"], name: "index_task_links_on_state_int"
+  add_index "task_links", ["user_id"], name: "index_task_links_on_user_id"
 
   create_table "users", force: :cascade do |t|
     t.string   "account"
