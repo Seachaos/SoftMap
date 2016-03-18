@@ -19,6 +19,28 @@ class ApiController < ApplicationController
 		}
 	end
 
+	def save_position
+		task = TaskLink.find_by_id(params[:task_id])
+		unless task.present? then
+			render :json=>{
+				:status => 1,
+				:emsg => "Can't set position"
+			}
+			return
+		end
+		task.x = params[:x].to_i
+		task.y = params[:y].to_i
+		unless task.save then
+			render :json=>{
+				:status => 1,
+				:emsg => "Can't save task"
+			}
+		end
+		render :json=>{
+			:status => 0
+		}
+	end
+
 	def get_task
 		tasks = TaskLink.where('previous_id = ?', params[:previous_id])
 		render :json=>{

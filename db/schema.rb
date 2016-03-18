@@ -21,14 +21,17 @@ ActiveRecord::Schema.define(version: 20160317164132) do
   create_table "task_links", force: :cascade do |t|
     t.integer  "next_id",          default: 0
     t.integer  "previous_id",      default: 0
+    t.integer  "x",                default: 10
+    t.integer  "y",                default: 40
+    t.integer  "board_id",         default: 10
     t.string   "name"
     t.string   "description"
     t.string   "state_str"
     t.integer  "state_int"
     t.integer  "user_id"
     t.integer  "assignee_user_id"
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "users", force: :cascade do |t|

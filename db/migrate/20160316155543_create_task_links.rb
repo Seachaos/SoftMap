@@ -3,6 +3,9 @@ class CreateTaskLinks < ActiveRecord::Migration
     create_table :task_links do |t|
       t.integer :next_id, :default=>0
       t.integer :previous_id, :default=>0
+      t.integer :x, :default=>10
+      t.integer :y, :default=>40
+      t.integer :board_id, :default=>10
       t.string :name
       t.string :description
       t.string :state_str

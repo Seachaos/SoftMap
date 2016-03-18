@@ -10,25 +10,21 @@ var panelHandleMouseMove = false;
 var TaskLink = React.createClass({
 	getInitialState : function(){
 		return {
-			x : this.props.x || 50,
-			y : this.props.y || 100
+			x : this.props.x || 10,
+			y : this.props.y || 10
 		}
 	},
 	handleMouseMove : function(e){
 		if(! this.inDragMode){
 			return
 		}
-		if(!this.actionX){
-			this.actionX = e.pageX;
-		} var diffX = e.pageX - this.actionX;
+		var diffX = e.pageX - this.actionX;
 		this.actionX = e.pageX;
 		if(diffX!=0){
 			var x = this.state.x + diffX;
 			this.setState({ x : x})
 		}
-		if(!this.actionY){
-			this.actionY = e.pageY;
-		} var diffY = e.pageY - this.actionY;
+		var diffY = e.pageY - this.actionY;
 		this.actionY = e.pageY;
 		if(diffY!=0){
 			var y = this.state.y + diffY;
@@ -43,15 +39,28 @@ var TaskLink = React.createClass({
 	handleMouseUp : function(e){
 		this.inDragMode = false;
 		panelHandleMouseMove = false;
+		this.setState({
+			savePosition : true
+		})
 	},
 	handleMouseOut : function(e){
 		panelHandleMouseMove = this.handleMouseMove;
-		// this.inDragMode = false;
-		// panelHandleMouseMove = false;
+	},
+	savePosition : function(){
+		savePosition = false;
+		apiCall('api/save_position', {
+			task_id : this.props.data.id,
+			x : this.state.x,
+			y : this.state.y
+		});
 	},
 	render: function(){
 		var data = this.props.data;
 		var transform = 'translate('+this.state.x+', ' + this.state.y + ')';
+		if(this.state.savePosition){
+			this.savePosition();
+		}
+		var _x_add_tag = 72;
 		return React.createElement('g', {
 				className : 'task_link_box',
 				transform : transform,
@@ -77,7 +86,18 @@ var TaskLink = React.createClass({
 					className : 'svg_move_tag',
 					y:-20
 				}),
-				React.createElement('text', { x:2, y: -5}, 'Move')
+				React.createElement('text', { x:5, y: -5}, 'Move')
+			),
+			// new tag
+			React.createElement('g',{
+					className : 'svg_new_tag_g'
+				},
+				React.createElement('rect', {
+					className : 'svg_add_tag',
+					x:_x_add_tag,
+					y:-20
+				}),
+				React.createElement('text', { x:_x_add_tag+10 , y: -5}, ' + ')
 			)
 			// ------ end ----
 		);
@@ -123,7 +143,8 @@ var TaskPanel = React.createClass({
 			y += 70;
 			return React.createElement(TaskLink, {
 				data:task,
-				y: y,
+				x: task.x,
+				y: task.y,
 				key: 'task_link_id_' + task.id
 			});
 		});

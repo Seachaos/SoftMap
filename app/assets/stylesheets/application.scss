@@ -93,6 +93,11 @@ section{
 	border-bottom: 3px #ffd7a3 solid;
 }
 
+@mixin svg_tag_group{
+    font-size : 15px;
+    fill:rgb(64,64,64);
+}
+
 #task_panel{
     padding:3px; margin:10px;
     border:1px #CCC solid;min-height:300px;
@@ -107,14 +112,25 @@ section{
     }
     .svg_move_tag_g{
         cursor: move;
-        font-size : 15px;
-        fill:rgb(64,64,64);
+        @include svg_tag_group();
 
         .svg_move_tag{
             fill:rgb(255, 245, 15);
             stroke-width:1px;
             stroke:rgb(0,0,0);
             width : 48px;
+            height : 20px;
+        }
+    }
+    .svg_new_tag_g{
+        cursor: pointer;
+        @include svg_tag_group();
+
+        .svg_add_tag{
+            fill:rgb(235, 245, 255);
+            stroke-width:1px;
+            stroke:rgb(0,0,0);
+            width : 28px;
             height : 20px;
         }
     }

@@ -30,6 +30,9 @@ function apiCall(url, data, onSuccess, sender){
 				message(resp.emsg);
 				return;
 			}
+			if(!onSuccess){
+				return;
+			}
 			if(sender){
 				onSuccess.bind(sender, resp)();
 				return;
