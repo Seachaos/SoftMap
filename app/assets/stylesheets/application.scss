@@ -74,7 +74,7 @@ section{
 	margin:0px auto;
 	background:#FFF;
 	padding:10px;
-	margin:20px 30px 20px 30px;
+	margin:20px 30px 10px 30px;
 	min-height:400px;
 	border:1px #CCC solid;
 }
@@ -98,6 +98,12 @@ section{
     fill:rgb(64,64,64);
 }
 
+footer{
+    text-align:right;
+    margin-right:30px;
+    margin-bottom:10px;
+}
+
 #task_panel{
     padding:3px; margin:10px;
     border:1px #CCC solid;min-height:300px;
@@ -110,7 +116,6 @@ section{
 
     .svg_task_box{
         height:100px;
-        width:100px;
         stroke-width:1px;
         stroke:rgb(0,0,0);
         fill:rgb(255, 255,255);
