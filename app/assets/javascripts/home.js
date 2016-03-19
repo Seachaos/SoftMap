@@ -1,4 +1,6 @@
-
+var taskPanel = false;
+var panelHandleMouseMove = false;
+var taskDispatcher = {};
 
 function message(msg){
 	alert(msg);
@@ -14,22 +16,16 @@ function showNewTaskDialog(opt){
 		document.getElementById('create_task_dialog'));
 }
 
-var taskPanel = false;
-var panelHandleMouseMove = false;
-
 var TaskLink = React.createClass({
 	getInitialState : function(){
-		this.loadTask()
 		return {
 			x : this.props.x || 10,
 			y : this.props.y || 10,
 			height : this.props.height || 100,
+			width : this.props.width || 100,
+			reload_sub_task : true,
 			previousData : this.props.previousData || false
 		}
-	},
-	updatePreviousData : function(data){
-		console.log('CALL');
-		this.setState({ previousData: data });
 	},
 	loadTask : function(){
 		apiCall('api/get_task.json',
@@ -48,6 +44,7 @@ var TaskLink = React.createClass({
 			});
 			if(task_array.length>0){
 				this.setState({
+					reload_sub_task : false,
 					sub_tasks : task_array
 				});
 			}
@@ -103,6 +100,7 @@ var TaskLink = React.createClass({
 	render: function(){
 		var data = this.props.data;
 		var transform = 'translate('+this.state.x+', ' + this.state.y + ')';
+		taskDispatcher[data.id] = this;
 		if(this.state.savePosition){
 			this.savePosition();
 		}
@@ -119,18 +117,24 @@ var TaskLink = React.createClass({
 				x2 : this.state.x,
 				y2 : this.state.y + this.state.height / 2
 			});
-		}		
+		}
+
+		if(this.state.reload_sub_task){
+			this.loadTask();
+		}
 
 		// return render
 		var box =  React.createElement('g', {
 				className : 'task_link_box',
-				transform : transform,
+				transform : transform
 			},
 			this.state.sub_tasks,
 			// ---- content ----
 			// background
 			React.createElement('rect', {
-				className : 'svg_task_link'
+				className : 'svg_task_box',
+				width : this.state.width,
+				height : this.state.height
 			}),
 			// name
 			React.createElement('text', { x:20, y:20 }, data.name),
@@ -146,6 +150,8 @@ var TaskLink = React.createClass({
 				},
 				React.createElement('rect', {
 					className : 'svg_move_tag',
+					width : 48,
+            		height : 20,
 					y:-20
 				}),
 				React.createElement('text', { x:5, y: -5}, 'Move')
@@ -157,6 +163,8 @@ var TaskLink = React.createClass({
 				},
 				React.createElement('rect', {
 					className : 'svg_add_tag',
+		            width : 28,
+		            height : 20,
 					x:_x_add_tag,
 					y:-20
 				}),
@@ -196,6 +204,37 @@ var TaskPanel = React.createClass({
 			panelHandleMouseMove(e);
 		}
 	},
+	spaceDragMove : function(e){
+		var diffX = e.pageX - this.actionX;
+		this.actionX = e.pageX;
+		var x = this.state.x + diffX;
+		var diffY = e.pageY - this.actionY;
+		this.actionY = e.pageY;
+		var y = this.state.y + diffY;
+		this.setState({
+			x: x,
+			y: y
+		});
+	},
+	handleMouseDown : function(e){
+		if(this.inDragMode){
+			this.actionX = e.pageX;
+			this.actionY = e.pageY;
+			panelHandleMouseMove = this.spaceDragMove;
+		}
+	},
+	handleMouseUp : function(e){
+		panelHandleMouseMove = false;
+	},
+	handleKeydown : function(e){
+		var code = event.which || event.keyCode;
+		if(code==32){
+			this.inDragMode = true;
+		}
+	},
+	handleKeyup : function(e){
+		this.inDragMode = false;
+	},
 	onWindowSizeChange : function(){
 		this.setState({
 			onWindowsSizeChange : true
@@ -203,9 +242,13 @@ var TaskPanel = React.createClass({
 	},
 	getInitialState : function(){
 		$(window).resize(this.onWindowSizeChange);
+		$(window).keydown(this.handleKeydown);
+		$(window).keyup(this.handleKeyup);
 		taskPanel = this;
 		return {
-			loading : true
+			loading : true,
+			x : 0,
+			y : 0
 		};
 	},
 	render : function(){
@@ -213,22 +256,43 @@ var TaskPanel = React.createClass({
 			this.loadTask();
 			return React.createElement('h1', null, 'Loading');
 		}
+		var transform = 'translate('+this.state.x+', ' + this.state.y + ')';
 		return React.createElement('svg', {
+			xmlns : "http://www.w3.org/2000/svg",
 			onMouseMove : this.handleMouseMove,
+			onMouseUp : this.handleMouseUp,
+			onMouseDown : this.handleMouseDown,
 			width : panel_width,
-			height : panel_height
-		}, this.state.task_array);
+			height : panel_height,
+		}, React.createElement('g', {
+			transform : transform
+		}, this.state.task_array));
 	}
 });
 
 var CreateTaskDialog = React.createClass({
 	saveTask : function(){
 		var data = {};
+		var task_dispatch_id = false;
 		for(key in this.state){
-			data['task['+key+']'] = this.state[key];
+			var value = this.state[key];
+			data['task['+key+']'] = value;
+
+			// check who need refresh
+			if(!task_dispatch_id){
+				if(key=='previous_id'&& value != 0){
+					task_dispatch_id = value;
+				}else if(key=='task_id'&&value != 0){
+					task_dispatch_id = value
+				}
+			}
 		}
 		apiCall('api/new_task.json' , data, function(resp){
-			if(taskPanel){
+			if(task_dispatch_id){
+				taskDispatcher[task_dispatch_id].setState({
+					reload_sub_task : true
+				})
+			}else if(taskPanel){
 				taskPanel.setState({
 					loading : true
 				});

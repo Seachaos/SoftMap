@@ -108,7 +108,7 @@ section{
         stroke-width:1;
     }
 
-    .svg_task_link{
+    .svg_task_box{
         height:100px;
         width:100px;
         stroke-width:1px;
@@ -123,8 +123,6 @@ section{
             fill:rgb(255, 245, 15);
             stroke-width:1px;
             stroke:rgb(0,0,0);
-            width : 48px;
-            height : 20px;
         }
     }
     .svg_new_tag_g{
@@ -135,8 +133,6 @@ section{
             fill:rgb(235, 245, 255);
             stroke-width:1px;
             stroke:rgb(0,0,0);
-            width : 28px;
-            height : 20px;
         }
     }
 }
