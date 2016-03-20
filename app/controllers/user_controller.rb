@@ -26,7 +26,7 @@ class UserController < ApplicationController
 	def logout
 		reset_session
 		flash[:login_msg] = 'Logout success'
-		redirect_to :controller=>'home'
+		redirect_to :controller=>'user', :action=>'login'
 		return true
 	end
 end

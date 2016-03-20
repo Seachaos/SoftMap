@@ -11,24 +11,50 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160317164132) do
+ActiveRecord::Schema.define(version: 20160320144838) do
+
+  create_table "board_permissions", force: :cascade do |t|
+    t.integer  "board_id"
+    t.integer  "user_id"
+    t.integer  "permission"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "boards", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "public_state", default: 0
+    t.string   "description"
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "boards", ["public_state"], name: "index_boards_on_public_state"
 
   create_table "error_codes", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
+  create_table "system_settings", force: :cascade do |t|
+    t.string   "name"
+    t.string   "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "task_links", force: :cascade do |t|
+    t.integer  "board_id",         default: 10
     t.integer  "next_id",          default: 0
     t.integer  "previous_id",      default: 0
     t.integer  "x",                default: 160
     t.integer  "y",                default: 40
     t.integer  "width",            default: 100
     t.integer  "height",           default: 100
-    t.integer  "board_id",         default: 10
     t.string   "name"
     t.string   "description"
     t.string   "state_str"
+    t.string   "change_code"
     t.integer  "state_int"
     t.integer  "user_id"
     t.integer  "assignee_user_id"

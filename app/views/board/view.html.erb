@@ -1,0 +1,29 @@
+<section>
+	<h1>Webcome</h1>
+	<hr />
+	<div id="controlBar"></div>
+	<div id="task_panel"
+		style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;" 
+		unselectable="on"
+		onselectstart="return false;" ></div>
+
+	<script type="text/javascript">
+	var url_api_get_task = '<%=url_for :controller=>:api, :action=>:get_task, :format=>:json %>';
+	var url_api_new_task = '<%=url_for :controller=>:api, :action=>:new_task, :format=>:json %>';
+	var url_api_save_position = '<%=url_for :controller=>:api, :action=>:save_position, :format=>:json %>';
+	var board_id = <%=@board.id%>;
+	var panel_height = $('#task_panel').height();
+	var panel_width = $('#task_panel').width();
+	$(document).ready(function(){
+		var onResize = function(){
+			$('#task_panel').height($(window).height() - $('#task_panel').offset().top - 100 );
+			panel_height = $('#task_panel').height();
+			panel_width = $('#task_panel').width();
+		}
+		$(window).resize(onResize)
+		onResize();
+		ReactDOM.render(React.createElement(NewTask), document.getElementById('controlBar'));
+		ReactDOM.render(React.createElement(TaskPanel), document.getElementById('task_panel'));
+	})
+	</script>
+</section>

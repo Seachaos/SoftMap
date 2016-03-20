@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'jquery-rails'
 gem 'react-rails', '~> 1.6.0'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
@@ -35,6 +34,8 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # gem 'capistrano-rails', group: :development
 
 group :development, :test do
+  # Rspec
+  gem 'rspec-rails', "~> 3.4.2"
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
 end

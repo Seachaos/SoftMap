@@ -23,6 +23,7 @@ var CreateTaskDialog = React.createClass({
 		for(key in this.state){
 			var value = this.state[key];
 			data['task['+key+']'] = value;
+			data['board_id'] = board_id;
 
 			// check who need refresh
 			if(!task_dispatch_id){
@@ -33,7 +34,7 @@ var CreateTaskDialog = React.createClass({
 				}
 			}
 		}
-		apiCall('api/new_task.json' , data, function(resp){
+		apiCall(url_api_new_task , data, function(resp){
 			if(task_dispatch_id){
 				taskDispatcher[task_dispatch_id].setState({
 					reload_sub_task : true

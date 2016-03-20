@@ -11,9 +11,10 @@ var TaskLinkBox = React.createClass({
 		}
 	},
 	loadTask : function(){
-		apiCall('api/get_task.json',
+		apiCall(url_api_get_task,
 		{
-			previous_id : this.props.data.id
+			previous_id : this.props.data.id,
+			board_id : board_id
 		}, function(resp){
 			var previousData = this.props.data;
 			var task_array = resp.tasks.map(function(task){
@@ -74,7 +75,7 @@ var TaskLinkBox = React.createClass({
 	},
 	savePosition : function(){
 		savePosition = false;
-		apiCall('api/save_position', {
+		apiCall(url_api_save_position, {
 			task_id : this.props.data.id,
 			x : this.state.x,
 			y : this.state.y

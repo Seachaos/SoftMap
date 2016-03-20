@@ -89,8 +89,30 @@ section{
 
 #header_bar{
 	background:#ffe700;
-	padding:10px;
+	padding:10px 10px 3px 10px;
 	border-bottom: 3px #ffd7a3 solid;
+    min-height:20px;
+    font-size:16px;
+
+    ul {list-style-type: none; padding: 0; margin: 0;}
+    li { display: inline-block;}
+    #logo{
+        float:left;
+    }
+    #menu{
+        margin:-10px 0px 0px 30px;
+        padding:0px 0px 0px 0px;
+        float:left;
+        li{
+            padding: 10px 20px 5px 10px;
+        }
+        .active{
+            background:#FFF;
+        }
+        a{
+            color: #336;
+        }
+    }
 }
 
 @mixin svg_tag_group{

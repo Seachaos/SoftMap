@@ -26,6 +26,9 @@ protected
     @isLogin = session[:isLogin]
     @user = User.find_by_id(session[:user_id])
     unless @user.present?
+      reset_session
+      @isLogin = false
+      @user = nil
       return false
     end
     return true

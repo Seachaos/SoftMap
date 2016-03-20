@@ -1,0 +1,22 @@
+<%
+public_state_option = Board.getBoardPublisStateVisiableDict.map { |key, value| [value, key] };
+%><section>
+	<% if @board.id.present? then %>
+	<% else %>
+		<h1>Create Board</h1>
+	<% end %>
+	<%=form_for @board, :url =>{:controller=>'board', :action=>'save'} do |f| %>
+		<div className="form-group" >
+			<%= f.label :name, "Name" %><br />
+		    <%= f.text_field :name, class: 'form-control' %>
+		</div>
+		<div className="form-group" >
+			<%= f.label :public_state, "Visiable" %><br />
+		    <%= f.select :public_state, options_for_select(public_state_option), class: 'form-control' %>
+		</div>
+		<% if @board.id.present? then %>
+			<input type="hidden" name="board_id" value="<%=@board.id%>" />
+		<% end %>
+		<%= f.submit 'Save' %>
+	<% end %>
+</section>

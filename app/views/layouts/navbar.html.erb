@@ -1,2 +1,28 @@
-<b>SoftMap</b>
+<%
+def text_menu (name, option)
+	url = url_for :controller=>option[:controller], :action=>option[:action]
+	className = ''
+	if option[:controller].present? and option[:controller].to_s == controller.controller_name.to_s then
+		if option[:action].present? then
+			if option[:action].to_s == controller.action_name.to_s  then
+				className = 'active'
+			end
+		else
+			className = 'active'
+		end
+	end
+	return '<li class="' + className + '" ><a href="'+url+'" >' + name + '</a></li>'
+end
+%><div id="logo" >
+	<b>SoftMap</b>
+</div>
+<ul id="menu">
+	<% if @isLogin then %>
+		<%=text_menu('Boards', :controller=>'board', :action=>'index').html_safe %>
+		<%=text_menu('Logout', :controller=>'user', :action=>'logout').html_safe %>
+	<% else %>
+		<%=text_menu('Boards', :controller=>'board', :action=>'index').html_safe %>
+		<%=text_menu('Login', :controller=>'user', :action=>'login').html_safe %>
+	<% end %>
+</ul>
 

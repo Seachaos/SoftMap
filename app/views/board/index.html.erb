@@ -1,0 +1,12 @@
+<section>
+	<%=flash[:msg]%><br />
+	<a href="<%=url_for :controller=>'board', :action=>'create' %>" class="button" >Create Board</a><br />
+	<h1>Public Boards：</h1>
+	<% unless @public_boards.present? then %>
+		There is no any public boards.<br />
+	<% else %><ul>
+		<% @public_boards.each do |board| %>
+			<li><a href="<%=url_for :controller=>:board, :action=>:view, :id=>board.id %>" ><%=board.name%></a></li>
+		<% end %>
+	</ul><% end %>
+</section>

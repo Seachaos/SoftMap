@@ -1,9 +1,10 @@
 
 var TaskPanel = React.createClass({
 	loadTask : function(){
-		apiCall('api/get_task.json',
+		apiCall(url_api_get_task,
 		{
-			previous_id : 0
+			previous_id : 0,
+			board_id : board_id
 		}, function(resp){
 			var task_array = resp.tasks.map(function(task){
 				return React.createElement(TaskLinkBox, {
@@ -48,7 +49,7 @@ var TaskPanel = React.createClass({
 		panelHandleMouseMove = false;
 	},
 	handleMouseOut : function(e){
-		panelHandleMouseMove = false;
+		// panelHandleMouseMove = false;
 	},
 	handleKeydown : function(e){
 		var code = event.which || event.keyCode;
