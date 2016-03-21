@@ -29,4 +29,32 @@ class UserController < ApplicationController
 		redirect_to :controller=>'user', :action=>'login'
 		return true
 	end
+
+	def register
+		unless SystemSetting.isRegisterPublic then
+			redirect_to :controller=>'user', :action=>'login'
+			return
+		end
+		@user = User.new
+	end
+
+	def create
+		unless SystemSetting.isRegisterPublic then
+			redirect_to :controller=>'user', :action=>'login'
+			return
+		end
+		@user = User.new(userCreateFromParams(params))
+		if @user.save then
+			flash[:msg] = 'Register Success'
+			redirect_to :controller=>'home', :action=>'index'
+		else
+			flash[:error] = 'Register failed'
+			render :action=>'register'
+		end
+	end
+
+protected
+	def userCreateFromParams(params)
+		params.require(:user).permit(:name, :account, :password, :mail)
+	end
 end

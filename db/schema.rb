@@ -16,7 +16,7 @@ ActiveRecord::Schema.define(version: 20160320144838) do
   create_table "board_permissions", force: :cascade do |t|
     t.integer  "board_id"
     t.integer  "user_id"
-    t.integer  "permission"
+    t.string   "permission"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -42,6 +42,8 @@ ActiveRecord::Schema.define(version: 20160320144838) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_index "system_settings", ["name"], name: "index_system_settings_on_name"
 
   create_table "task_links", force: :cascade do |t|
     t.integer  "board_id",         default: 10
@@ -70,11 +72,14 @@ ActiveRecord::Schema.define(version: 20160320144838) do
   add_index "task_links", ["user_id"], name: "index_task_links_on_user_id"
 
   create_table "users", force: :cascade do |t|
+    t.string   "name"
     t.string   "account"
     t.string   "password"
-    t.string   "permission"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string   "permission", default: "user"
+    t.string   "token"
+    t.string   "mail"
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
   end
 
 end

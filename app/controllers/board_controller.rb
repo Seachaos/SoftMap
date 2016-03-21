@@ -3,6 +3,10 @@ class BoardController < ApplicationController
 
 	def index
 		@public_boards = Board.getPublicBoards
+		@own_boards = false
+		if @isLogin then
+			@own_boards = Board.getOwnBoards @user
+		end
 	end
 
 	def create
@@ -15,8 +19,13 @@ class BoardController < ApplicationController
 			redirect_to :action=>:index
 			return
 		end
-		# TODO check permission (visiable)
-
+		
+		# check permission for view
+		unless @board.permissionForView(@user)
+			flash[:error] = 'Access deny'
+			redirect_to :action=>:index
+			return
+		end
 
 	end
 
@@ -30,6 +39,14 @@ class BoardController < ApplicationController
 			@board = Board.new(boardFromParams(params))
 		end
 		@board.save
+
+		# set permission
+		permission = BoardPermission.new
+		permission.board_id = @board.id
+		permission.user_id = @user.id
+		permission.permission = 'Creator'
+		permission.save
+
 		flash[:msg] = 'Board save success'
 		redirect_to :action=>:index
 	end

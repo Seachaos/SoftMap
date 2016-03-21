@@ -3,6 +3,11 @@
 <%=form_for @user, :url=>{:action=>'login'} do |f| %>
 	<%=label_tag :account, 'Account' %><br /><%=f.text_field :account %><br />
 	<%=label_tag :password, 'Password' %><br /><%=f.password_field :password %><br />
-	<%= submit_tag 'Login'%>
+	<%= submit_tag 'Login', :class=>'button' %>
+	<% if SystemSetting.isRegisterPublic then %>
+		<hr />
+		<a href="<%=url_for :controller=>'user', :action=>'register' %>" class="button" >Register</a>
+	<% end %>
 <% end %>
+
 </section>

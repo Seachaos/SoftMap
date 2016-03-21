@@ -1,12 +1,27 @@
-<section>
-	<%=flash[:msg]%><br />
+<%
+def show_board_link (board)
+	%>
+	<li><a href="<%=url_for :controller=>:board, :action=>:view, :id=>board.id %>" ><%=board.name%></a></li>
+	<% 
+end
+%><section>
+	<%=render :template=>'layouts/_message'%>
 	<a href="<%=url_for :controller=>'board', :action=>'create' %>" class="button" >Create Board</a><br />
 	<h1>Public Boards：</h1>
 	<% unless @public_boards.present? then %>
 		There is no any public boards.<br />
 	<% else %><ul>
-		<% @public_boards.each do |board| %>
-			<li><a href="<%=url_for :controller=>:board, :action=>:view, :id=>board.id %>" ><%=board.name%></a></li>
-		<% end %>
+		<% @public_boards.each do |board| 
+			show_board_link board
+		end %>
+	</ul><% end %>
+<hr />
+	<% unless @own_boards.present? then %>
+		You don't have any private board.
+	<% else %>
+		<h1>Private Boards：</h1>
+		<ul><% @own_boards.each do |board|
+			show_board_link board
+		end %>
 	</ul><% end %>
 </section>

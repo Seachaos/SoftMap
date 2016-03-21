@@ -1,0 +1,19 @@
+<%= form_for @user, :url=>{:action=>:create} do |f| %>
+	<div className="form-group" >
+		<%= f.label :name, "Name" %><br />
+	    <%= f.text_field :name, class: 'form-control' %>
+	</div>
+	<div className="form-group" >
+		<%= f.label :account, "Account" %><br />
+	    <%= f.text_field :account, class: 'form-control' %>
+	</div>
+	<div className="form-group" >
+		<%= f.label :password, "Password" %><br />
+	    <%= f.password_field :password, class: 'form-control' %>
+	</div>
+	<div className="form-group" >
+		<%= f.label :mail, "Mail" %><br />
+	    <%= f.text_field :mail, class: 'form-control' %>
+	</div>
+	<%=f.submit 'Submit', :class=>'button' %>
+<% end %>

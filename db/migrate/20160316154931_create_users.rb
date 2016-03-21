@@ -1,9 +1,12 @@
 class CreateUsers < ActiveRecord::Migration
   def change
     create_table :users do |t|
+      t.string :name
       t.string :account
       t.string :password
-      t.string :permission
+      t.string :permission, :default=>'user'
+      t.string :token
+      t.string :mail
 
       t.timestamps null: false
     end

@@ -64,8 +64,13 @@ protected
 			}
 			return false
 		end
-		# TODO check permission
-
+		unless @board.permissionForView(@user) then
+			render :json=>{
+				:status => 1,
+				:emsg => "Access deny"
+			}
+			return false
+		end
 		return true
 	end
 end

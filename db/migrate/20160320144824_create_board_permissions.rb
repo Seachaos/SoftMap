@@ -3,7 +3,7 @@ class CreateBoardPermissions < ActiveRecord::Migration
     create_table :board_permissions do |t|
       t.integer :board_id
       t.integer :user_id
-      t.integer :permission
+      t.string :permission
 
       t.timestamps null: false
     end

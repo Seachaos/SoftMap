@@ -13,6 +13,7 @@ class CreateBoards < ActiveRecord::Migration
     board.name = 'Public DEMO'
     board.save
 
+    board = Board.new
     board.public_state = 1
     board.name = 'Protected DEMO'
     board.save
