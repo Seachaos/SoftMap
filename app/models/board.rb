@@ -39,21 +39,28 @@ class Board < ActiveRecord::Base
 
 	def permissionForView(user)
 		return true if self.public_state === 2
-		return false unless user.present?
-		
-		permission = BoardPermission.where('board_id=? and user_id=?', self.id, user.id).first
-		return false unless permission.present?
-		return true if permission.permission.include? 'Creator'
-		return false
+		checkPermissionExists user, 'Creator'
+	end
+
+	def permissionForEdit(user)
+		if user.present? then
+			return true if self.public_state === 2
+		end
+		checkPermissionExists user, 'Creator'
 	end
 
 	def permissionForInvitedPeople(user)
 		return false unless self.public_state == 0
+		checkPermissionExists user, 'Creator'
+	end
+protected
+	
+	def checkPermissionExists(user, name)
 		return false unless user.present?
 
 		permission = BoardPermission.where('board_id=? and user_id=?', self.id, user.id).first
 		return false unless permission.present?
-		return true if permission.permission.include? 'Creator'
+		return true if permission.permission.include? name
 		return false
 	end
 end

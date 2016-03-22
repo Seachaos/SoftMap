@@ -6,6 +6,7 @@ var TaskLinkBox = React.createClass({
 			y : this.props.y || 10,
 			height : this.props.height || 100,
 			width : this.props.width || 100,
+			canEdit : this.props.canEdit || false,
 			reload_sub_task : true,
 			previousData : this.props.previousData || false
 		}
@@ -16,12 +17,14 @@ var TaskLinkBox = React.createClass({
 			previous_id : this.props.data.id,
 			board_id : board_id
 		}, function(resp){
+			var canEdit = this.state.canEdit;
 			var previousData = this.props.data;
 			var task_array = resp.tasks.map(function(task){
 				return React.createElement(TaskLinkBox, {
 					data:task,
 					x: task.x,
 					y: task.y,
+					canEdit : canEdit,
 					key: 'task_link_id_' + task.id,
 					previousData : previousData
 				});
@@ -59,6 +62,7 @@ var TaskLinkBox = React.createClass({
 	handleMouseUp : function(e){
 		this.inDragMode = false;
 		panelHandleMouseMove = false;
+		this.needSavePosition = true;
 		this.setState({
 			savePosition : true
 		})
@@ -74,22 +78,74 @@ var TaskLinkBox = React.createClass({
 		});
 	},
 	savePosition : function(){
-		savePosition = false;
+		this.needSavePosition = false;
 		apiCall(url_api_save_position, {
 			task_id : this.props.data.id,
 			x : this.state.x,
 			y : this.state.y
 		});
 	},
+	createEditTags : function(){
+		var data = this.props.data;
+		var width = this.state.width;
+		var height = this.state.height;
+		var resp = [];
+
+		var _x_add_tag = width - 28;
+		// add tag
+		resp.push(React.createElement('g',{
+				className : 'svg_new_tag_g',
+				onClick : this.handleClickNewSubTask,
+				key: data.id+'_tag_add'
+			},
+			React.createElement('rect', {
+				className : 'svg_add_tag',
+	            width : 28,
+	            height : 20,
+				x: _x_add_tag,
+				y:-20
+			}),
+			React.createElement('text', { x:_x_add_tag+10 , y: -5}, ' + ')
+		));
+
+		// move tag
+		resp.push(React.createElement('g',{
+				onMouseMove : this.handleMouseMove,
+				onMouseDown : this.handleMouseDown,
+				onMouseUp : this.handleMouseUp,
+				onMouseOut : this.handleMouseOut,
+				className : 'svg_move_tag_g',
+				key: data.id+'_tag_move'
+			},
+			React.createElement('rect', {
+				className : 'svg_move_tag',
+				width : 48,
+        		height : 20,
+				y:-20
+			}),
+			React.createElement('text', { x:5, y: -5}, 'Move')
+		));
+
+		// resize tag
+		resp.push(React.createElement(TaskLinkBoxButtonResize, {
+			data : data,
+			key: data.id+'_tag_resize'
+		}));
+		return resp;
+	},
 	render: function(){
 		var data = this.props.data;
+		var height = this.state.height;
+		var width = this.state.width;
+		var text_padding = 10;
+		var text_width = width - text_padding * 2;
+
 		var transform = 'translate('+this.state.x+', ' + this.state.y + ')';
 		taskDispatcher[data.id] = this;
-		if(this.state.savePosition){
+		if(this.needSavePosition){
 			this.savePosition();
 		}
-		var _x_add_tag = 72;
-
+		
 		// prepare link line
 		var link_line = null;
 		if(this.state.previousData){ // if has previous data
@@ -107,60 +163,53 @@ var TaskLinkBox = React.createClass({
 			this.loadTask();
 		}
 
+		var canEdit = this.props.canEdit;
+
+		var tags = [];
+		if(canEdit){
+			tags = this.createEditTags();
+		}
+
+		// assignee user name
+		var user_name = user_list[data.assignee_user_id];
+		if(!user_name){ user_name = 'Unknow' }
+		user_name = 'Assignee：\n' + user_name;
+		if(user_name.length * 6 > (width - text_padding)){
+			var len = (width - text_padding * 2) / 6
+			console.log(user_name.length * 8);
+			user_name = user_name.substr(0, len - 2) + '...';
+		}
+
 		// return render
 		var box =  React.createElement('g', {
 				className : 'task_link_box',
-				transform : transform
+				transform : transform,
+				key : data.id + '_g_box_body'
 			},
 			this.state.sub_tasks,
 			// ---- content ----
 			// background
 			React.createElement('rect', {
 				className : 'svg_task_box',
-				width : this.state.width,
-				height : this.state.height
+				width : width,
+				height : height
 			}),
 			// name
-			React.createElement('text', { x:20, y:20 }, data.name),
+			React.createElement('text', { x : text_padding, y : 20 }, data.name),
 			// description
-			React.createElement('text', { x:20, y:50 }, data.description),
-			// move taq
-			React.createElement('g',{
-					onMouseMove : this.handleMouseMove,
-					onMouseDown : this.handleMouseDown,
-					onMouseUp : this.handleMouseUp,
-					onMouseOut : this.handleMouseOut,
-					className : 'svg_move_tag_g'
-				},
-				React.createElement('rect', {
-					className : 'svg_move_tag',
-					width : 48,
-            		height : 20,
-					y:-20
-				}),
-				React.createElement('text', { x:5, y: -5}, 'Move')
-			),
-			// new tag
-			React.createElement('g',{
-					className : 'svg_new_tag_g',
-					onClick : this.handleClickNewSubTask
-				},
-				React.createElement('rect', {
-					className : 'svg_add_tag',
-		            width : 28,
-		            height : 20,
-					x:_x_add_tag,
-					y:-20
-				}),
-				React.createElement('text', { x:_x_add_tag+10 , y: -5}, ' + ')
-			),
-			// resize
-			React.createElement(TaskLinkBoxButtonResize, {
-				data : data
-			})
+			React.createElement('text', { x : text_padding, y : 40 }, data.description),
+			// assignee_user
+			React.createElement('text', { x : text_padding,
+				y : height - text_padding,
+				width : text_width,
+				className : 'svg_text_assignee' }, user_name),
+			// tags ---- 
+			tags
 			// ------ end ----
 		);
-		return React.createElement('g', null,
+		return React.createElement('g', {
+				key : data.id + '_g_box'
+			},
 			link_line,
 			box);
 	}
@@ -169,10 +218,11 @@ var TaskLinkBox = React.createClass({
 var TaskLinkBoxButtonResize = React.createClass({
 	render : function(){
 		var data = this.props.data;
-		var width = 60;
+		var width = 56;
 		var height = 20;
 		return React.createElement('g', {
-				className : 'svg_new_tag_g'
+				className : 'svg_new_tag_g',
+				key : data.id + '_g_resize_tag'
 			},
 			React.createElement('rect', {
 				className : 'svg_add_tag',
@@ -183,7 +233,7 @@ var TaskLinkBoxButtonResize = React.createClass({
 			}),
 			React.createElement('text', {
 				x: data.width - width + 5,
-				y: data.height + 16 }, 'TODO')
+				y: data.height + 16 }, 'Resize')
 		);
 	}
 });

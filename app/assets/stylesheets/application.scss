@@ -131,6 +131,11 @@ footer{
     border:1px #CCC solid;min-height:300px;
     background:#F5F5F5;
 
+    .svg_text_assignee{
+        font-size : 12px;
+        fill:#666666;
+    }
+
     .svg_link_line{
         stroke:rgb(0,0,0);
         stroke-width:1;

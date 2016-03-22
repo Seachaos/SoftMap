@@ -6,11 +6,13 @@ var TaskPanel = React.createClass({
 			previous_id : 0,
 			board_id : board_id
 		}, function(resp){
+			var canEdit = this.state.canEdit;
 			var task_array = resp.tasks.map(function(task){
 				return React.createElement(TaskLinkBox, {
 					data:task,
 					x: task.x,
 					y: task.y,
+					canEdit : canEdit,
 					key: 'task_link_id_' + task.id
 				});
 			});
@@ -73,6 +75,7 @@ var TaskPanel = React.createClass({
 		$(window).keyup(this.handleKeyup);
 		taskPanel = this;
 		return {
+			canEdit : this.props.canEdit || false,
 			loading : true,
 			x : 0,
 			y : 0

@@ -1,7 +1,7 @@
 class CreateUsers < ActiveRecord::Migration
   def change
     create_table :users do |t|
-      t.string :name
+      t.string :name, :default=>'No Name'
       t.string :account
       t.string :password
       t.string :permission, :default=>'user'
@@ -16,6 +16,7 @@ class CreateUsers < ActiveRecord::Migration
     user.account = 'admin'
     user.password = 'admin'
     user.permission = 'admin'
+    user.name = 'admin'
     user.save
   end
 end

@@ -27,6 +27,27 @@ class BoardController < ApplicationController
 			return
 		end
 
+		@users = false # list user for selector
+		@view_only = false
+		@view_only = true if params[:mode] == 'view_only'
+		
+		@permissionEdit = false
+		@canEdit = false # control edit mode
+
+		if @board.permissionForEdit(@user) then
+			user_ids = []
+			@users = {}
+			BoardPermission.where('board_id=?', @board.id).each do |permission|
+				user_ids.push(permission.user_id)
+			end
+			User.where({:id => user_ids } ).each do |user|
+				@users[user.id] = user.name
+			end
+
+			@permissionEdit = true
+			@canEdit = true unless @view_only
+		end
+
 	end
 
 	def save

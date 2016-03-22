@@ -54,6 +54,7 @@ var CreateTaskDialog = React.createClass({
 		return {
 			'name':'',
 			'description':'',
+			'assignee_user_id':0,
 			'task_id': task_id,
 			'previous_id': previous_id
 		}
@@ -69,6 +70,8 @@ var CreateTaskDialog = React.createClass({
 		title,
 		createInput('TaskName：', 'name', this),
 		createInput('Description：', 'description', this),
+		createInput('Assignee：', 'assignee_user_id', this, user_list),
+		
 		React.createElement('input', {type:'hidden', name: 'task_id', value: this.state.task_id}),
 		React.createElement('input', {type:'hidden', name: 'previous_id', value: this.state.previous_id}),
 		React.createElement('div', {
@@ -90,22 +93,42 @@ var NewTask = React.createClass({
 	}
 });
 
-function createInput(label, name, sender){
+function createInput(label, name, sender, option){
 	var handleChange = function(e){
 		var obj = {};
 		obj[name] = e.target.value;
 		sender.setState(obj)
+	}
+
+	var input = false;
+	var value = sender.state[name];
+
+	if(typeof(option)=='object'){
+		var _key = '_option_create_task_'+name;
+		var options = [React.createElement('option',{value:0, key:_key + '0' },'Me')];
+		for( i in option ){
+			option_name = option[i];
+			if(!option_name){ option_name = 'null name'};
+			options.push(React.createElement('option',{value:i, key:_key + i }, option_name));
+		}
+		input = React.createElement('select', {
+			onChange : handleChange,
+			name : name,
+			defaultValue : value
+		}, options)
+	}else{
+		input = React.createElement('input', {
+			onChange : handleChange,
+			type:'text',
+			name:name,
+			value: value
+		})
 	}
 	return React.createElement('div', {
 
 		}, 
 		React.createElement('label', null, 
 			label,
-			React.createElement('input', {
-				onChange : handleChange,
-				type:'text',
-				name:name,
-				value: sender.state[name]
-			}))
+			input)
 		)
 }

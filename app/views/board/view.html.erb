@@ -1,7 +1,14 @@
 <section>
 	<h1>Webcome</h1>
 	<hr />
-	<div id="controlBar"></div>
+	<div id="controlBar">
+		<% if @view_only and @permissionEdit then %>
+			<a href="<%=url_for :mode=>:edit_mode %>" class="button" >Edit Mode</a>
+		<% elsif @permissionEdit %>
+			<a href="<%=url_for :mode=>:view_only %>" class="button" >View Mode</a>
+		<% end %>
+		<span id="reactNewTaskArea" ></span>
+	</div>
 	<div id="task_panel"
 		style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;" 
 		unselectable="on"
@@ -14,6 +21,10 @@
 	var board_id = <%=@board.id%>;
 	var panel_height = $('#task_panel').height();
 	var panel_width = $('#task_panel').width();
+
+	var user_list = <%= @users.to_json.to_s.html_safe %>;
+	var canEdit = <%=@canEdit%>;
+
 	$(document).ready(function(){
 		var onResize = function(){
 			$('#task_panel').height($(window).height() - $('#task_panel').offset().top - 100 );
@@ -22,8 +33,10 @@
 		}
 		$(window).resize(onResize)
 		onResize();
-		ReactDOM.render(React.createElement(NewTask), document.getElementById('controlBar'));
-		ReactDOM.render(React.createElement(TaskPanel), document.getElementById('task_panel'));
+		if(canEdit){
+			ReactDOM.render(React.createElement(NewTask), document.getElementById('reactNewTaskArea'));
+		}
+		ReactDOM.render(React.createElement(TaskPanel, {canEdit:canEdit} ), document.getElementById('task_panel'));
 	})
 	</script>
 </section>
