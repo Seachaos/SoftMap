@@ -48,6 +48,9 @@ class Board < ActiveRecord::Base
 	end
 
 	def permissionForInvitedPeople(user)
+		return false unless self.public_state == 0
+		return false unless user.present?
+
 		permission = BoardPermission.where('board_id=? and user_id=?', self.id, user.id).first
 		return false unless permission.present?
 		return true if permission.permission.include? 'Creator'

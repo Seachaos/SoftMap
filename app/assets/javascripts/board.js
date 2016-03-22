@@ -8,6 +8,7 @@ function message(msg){
 
 function showNewTaskDialog(opt){
 	var opt = opt || {};
+	opt.key = uuid();
 
 	$.facebox('<div id="create_task_dialog" />');
 	ReactDOM.render(
