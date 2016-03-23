@@ -10,6 +10,7 @@ var TaskLinkBox = React.createClass({
 			width : this.props.data.width || min_box_width,
 			canEdit : this.props.canEdit || false,
 			reload_sub_task : true,
+			data : this.props.data,
 			previousData : this.props.previousData || false
 		}
 	},
@@ -59,10 +60,11 @@ var TaskLinkBox = React.createClass({
 		panelHandleMouseMove = this.handleMouseMove;
 	},
 	handleClickNewSubTask : function(e){
-		var data = this.props.data;
+		var data = this.state.data;
 		showNewTaskDialog({
 			previous_id : data.id,
-			previous_name : data.name
+			previous_name : data.name,
+			next_x : this.state.width + 50
 		});
 	},
 	handleResize : function(width, height){
@@ -74,7 +76,7 @@ var TaskLinkBox = React.createClass({
 	savePosition : function(){
 		this.needSavePosition = false;
 		apiCall(url_api_save_position, {
-			task_id : this.props.data.id,
+			task_id : this.state.data.id,
 			x : this.state.x,
 			y : this.state.y
 		});
@@ -82,13 +84,13 @@ var TaskLinkBox = React.createClass({
 	saveSize : function(){
 		this.needSaveSize = false;
 		apiCall(url_api_save_position, {
-			task_id : this.props.data.id,
+			task_id : this.state.data.id,
 			width : this.state.width,
 			height : this.state.height
 		});
 	},
 	createEditTags : function(){
-		var data = this.props.data;
+		var data = this.state.data;
 		var width = this.state.width;
 		var height = this.state.height;
 		var resp = [];
@@ -153,7 +155,7 @@ var TaskLinkBox = React.createClass({
 		return resp;
 	},
 	render: function(){
-		var data = this.props.data;
+		var data = this.state.data;
 		var height = this.state.height;
 		var width = this.state.width;
 		var text_padding = 10;
@@ -186,7 +188,7 @@ var TaskLinkBox = React.createClass({
 			this.loadTask();
 		}else{
 			var canEdit = this.state.canEdit;
-			var previousData = this.props.data;
+			var previousData = this.state.data;
 			previousData.width = width;
 			previousData.height = height;
 			var task_array = this.state.sub_task_array.map(function(task){
@@ -231,10 +233,12 @@ var TaskLinkBox = React.createClass({
 				width : width,
 				height : height
 			}),
+			// id
+			React.createElement('text', { x : text_padding, y : 16 }, '#'+data.id),
 			// name
-			React.createElement('text', { x : text_padding, y : 20 }, data.name),
+			React.createElement('text', { x : text_padding, y : 36 }, data.name),
 			// description
-			React.createElement('text', { x : text_padding, y : 40 }, data.description),
+			React.createElement('text', { x : text_padding, y : 56 }, data.description),
 			// assignee_user
 			React.createElement('text', { x : text_padding,
 				y : height - text_padding,
@@ -253,6 +257,14 @@ var TaskLinkBox = React.createClass({
 });
 
 var TaskLinkBoxButtonEdit = React.createClass({
+	handleClick : function(){
+		var data = this.props.data;
+		showNewTaskDialog({
+			task_id : data.id,
+			previous_id : data.previous_id,
+			data : data
+		});
+	},
 	render : function(){
 		var data = this.props.data;
 		var width = 24;
@@ -261,6 +273,7 @@ var TaskLinkBoxButtonEdit = React.createClass({
 		return React.createElement('g',{
 				className : 'svg_edit_tag_g',
 				key : data.id + '_g_edit_tag',
+				onClick : this.handleClick
 			},
 			React.createElement('rect', {
 				className : 'svg_edit_tag',

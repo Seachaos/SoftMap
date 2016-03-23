@@ -21,6 +21,11 @@ var TaskPanel = React.createClass({
 				task_array : task_array,
 				loading : false
 			});
+			
+			if(!this.state.canEdit){ 
+				$('#svg_task_panel').css('cursor', 'move');
+				this.inDragMode = true;
+			};
 		}, this);
 	},
 	handleMouseMove : function(e){
@@ -57,6 +62,7 @@ var TaskPanel = React.createClass({
 		// panelHandleMouseMove = false;
 	},
 	handleKeydown : function(e){
+		if(!this.state.canEdit){ return; }
 		var code = event.which || event.keyCode;
 		if(code==32){
 			$('#svg_task_panel').css('cursor', 'move');
@@ -64,6 +70,7 @@ var TaskPanel = React.createClass({
 		}
 	},
 	handleKeyup : function(e){
+		if(!this.state.canEdit){ return; }
 		this.inDragMode = false;
 		$('#svg_task_panel').css('cursor', '');
 	},

@@ -3,11 +3,22 @@ class ApiController < ApplicationController
 
 	def new_task
 		return unless verify_board_permission
-		task = TaskLink.find_by_id(params[:task_id])
+		if params[:task].present? then
+			task = TaskLink.find_by_id(params[:task][:task_id])
+		end
 		if task.present? then
+			board = Board.find_by_id(task.board_id)
+			unless board.permissionForEdit(@user) then
+				render :json=>{
+					:status => 1,
+					:emsg => "Access deny"
+				}
+				return
+			end
 			task.update(TaskLink.fromParams(params))
 		else
 			task = TaskLink.new(TaskLink.fromParams(params))
+			task.x = params[:next_x] if params[:next_x].present?
 		end
 
 		# verify user

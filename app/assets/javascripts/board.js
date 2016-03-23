@@ -25,7 +25,6 @@ var CreateTaskDialog = React.createClass({
 		for(key in this.state){
 			var value = this.state[key];
 			data['task['+key+']'] = value;
-			data['board_id'] = board_id;
 
 			// check who need refresh
 			if(!task_dispatch_id){
@@ -36,7 +35,16 @@ var CreateTaskDialog = React.createClass({
 				}
 			}
 		}
+		data['board_id'] = board_id;
+		data['next_x'] = this.props.next_x || 190
+
 		apiCall(url_api_new_task , data, function(resp){
+			console.log(this.state.task_id);
+			if(this.state.task_id!=0){
+				taskDispatcher[this.state.task_id].setState({
+					data : this.state
+				});
+			}
 			if(task_dispatch_id){
 				taskDispatcher[task_dispatch_id].setState({
 					reload_sub_task : true
@@ -47,18 +55,24 @@ var CreateTaskDialog = React.createClass({
 				});
 			}
 			$.facebox.close();
-		});
+		}, this);
 	},
 	getInitialState : function(){
 		task_id = this.props.task_id || 0
 		previous_id = this.props.previous_id || 0
-		return {
-			'name':'',
-			'description':'',
-			'assignee_user_id':0,
+		var data = this.props.data || {}
+		var initData = {
+			'name': data.name || '',
+			'description': data.description || '',
+			'assignee_user_id': data.assignee_user_id || 0,
 			'task_id': task_id,
 			'previous_id': previous_id
+		};
+		// copy all data
+		for(i in data){
+			initData[i] = data[i];
 		}
+		return initData;
 	},
 	render : function(){
 		var title = null;
