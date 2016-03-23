@@ -49,6 +49,9 @@ var TaskPanel = React.createClass({
 	},
 	handleMouseUp : function(e){
 		panelHandleMouseMove = false;
+		if(panelHandleMouseUp){
+			panelHandleMouseUp(e);
+		}
 	},
 	handleMouseOut : function(e){
 		// panelHandleMouseMove = false;

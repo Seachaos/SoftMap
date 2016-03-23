@@ -146,7 +146,6 @@ footer{
     }
 
     .svg_task_box{
-        height:100px;
         stroke-width:1px;
         stroke:rgb(0,0,0);
         fill:rgb(255, 255,255);
@@ -161,11 +160,31 @@ footer{
             stroke:rgb(0,0,0);
         }
     }
+    .svg_resize_tag_g{
+        cursor: se-resize;
+        @include svg_tag_group();
+
+        .svg_resize_tag{
+            fill:rgb(255, 245, 15);
+            stroke-width:1px;
+            stroke:rgb(0,0,0);
+        }
+    }
     .svg_new_tag_g{
         cursor: pointer;
         @include svg_tag_group();
 
         .svg_add_tag{
+            fill:rgb(235, 245, 255);
+            stroke-width:1px;
+            stroke:rgb(0,0,0);
+        }
+    }
+    .svg_edit_tag_g{
+        cursor: pointer;
+        @include svg_tag_group();
+
+        .svg_edit_tag{
             fill:rgb(235, 245, 255);
             stroke-width:1px;
             stroke:rgb(0,0,0);

@@ -57,9 +57,11 @@ class ApiController < ApplicationController
 			return
 		end
 
+		task.x = params[:x].to_i if params[:x].present?
+		task.y = params[:y].to_i if params[:y].present?
+		task.width = params[:width].to_i if params[:width].present?
+		task.height = params[:height].to_i if params[:height].present?
 
-		task.x = params[:x].to_i
-		task.y = params[:y].to_i
 		unless task.save then
 			render :json=>{
 				:status => 1,

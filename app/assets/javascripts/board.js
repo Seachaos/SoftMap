@@ -1,5 +1,6 @@
 var taskPanel = false;
 var panelHandleMouseMove = false;
+var panelHandleMouseUp = false;
 var taskDispatcher = {};
 
 function message(msg){

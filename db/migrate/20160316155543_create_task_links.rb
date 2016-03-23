@@ -4,9 +4,9 @@ class CreateTaskLinks < ActiveRecord::Migration
       t.integer :board_id, :default=>0, :index=>true
       t.integer :next_id, :default=>0, :index=>true
       t.integer :previous_id, :default=>0, :index=>true
-      t.integer :x, :default=>160
-      t.integer :y, :default=>40
-      t.integer :width, :default=>100
+      t.integer :x, :default=>190
+      t.integer :y, :default=>60
+      t.integer :width, :default=>150
       t.integer :height, :default=>100
       t.integer :board_id, :default=>10, :index=>true
       t.string :name

@@ -18,6 +18,12 @@
 	var url_api_get_task = '<%=url_for :controller=>:api, :action=>:get_task, :format=>:json %>';
 	var url_api_new_task = '<%=url_for :controller=>:api, :action=>:new_task, :format=>:json %>';
 	var url_api_save_position = '<%=url_for :controller=>:api, :action=>:save_position, :format=>:json %>';
+
+	var url_icon_crop = '<%= asset_path 'ic_crop_black_24dp_2x.png' %>';
+	var url_icon_move = '<%= asset_path 'ic_open_with_black_24dp_2x.png' %>';
+	var url_icon_edit = '<%= asset_path 'ic_create_black_24dp_2x'%>';
+
+
 	var board_id = <%=@board.id%>;
 	var panel_height = $('#task_panel').height();
 	var panel_width = $('#task_panel').width();

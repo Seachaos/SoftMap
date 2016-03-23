@@ -1,11 +1,13 @@
+var min_box_width = 150;
+var min_box_height = 100;
 
 var TaskLinkBox = React.createClass({
 	getInitialState : function(){
 		return {
 			x : this.props.x || 10,
 			y : this.props.y || 10,
-			height : this.props.height || 100,
-			width : this.props.width || 100,
+			height : this.props.data.height || min_box_height,
+			width : this.props.data.width || min_box_width,
 			canEdit : this.props.canEdit || false,
 			reload_sub_task : true,
 			previousData : this.props.previousData || false
@@ -17,24 +19,10 @@ var TaskLinkBox = React.createClass({
 			previous_id : this.props.data.id,
 			board_id : board_id
 		}, function(resp){
-			var canEdit = this.state.canEdit;
-			var previousData = this.props.data;
-			var task_array = resp.tasks.map(function(task){
-				return React.createElement(TaskLinkBox, {
-					data:task,
-					x: task.x,
-					y: task.y,
-					canEdit : canEdit,
-					key: 'task_link_id_' + task.id,
-					previousData : previousData
-				});
+			this.setState({
+				reload_sub_task : false,
+				sub_task_array : resp.tasks
 			});
-			if(task_array.length>0){
-				this.setState({
-					reload_sub_task : false,
-					sub_tasks : task_array
-				});
-			}
 		}, this);
 	},
 	handleMouseMove : function(e){
@@ -77,12 +65,26 @@ var TaskLinkBox = React.createClass({
 			previous_name : data.name
 		});
 	},
+	handleResize : function(width, height){
+		this.setState({
+			width: width,
+			height : height
+		});
+	},
 	savePosition : function(){
 		this.needSavePosition = false;
 		apiCall(url_api_save_position, {
 			task_id : this.props.data.id,
 			x : this.state.x,
 			y : this.state.y
+		});
+	},
+	saveSize : function(){
+		this.needSaveSize = false;
+		apiCall(url_api_save_position, {
+			task_id : this.props.data.id,
+			width : this.state.width,
+			height : this.state.height
 		});
 	},
 	createEditTags : function(){
@@ -119,17 +121,34 @@ var TaskLinkBox = React.createClass({
 			},
 			React.createElement('rect', {
 				className : 'svg_move_tag',
-				width : 48,
+				width : 36,
         		height : 20,
 				y:-20
 			}),
-			React.createElement('text', { x:5, y: -5}, 'Move')
+			React.createElement('image',{
+				xlinkHref:url_icon_move,
+				width : 36,
+        		height : 16,
+				y:-18
+			})
 		));
 
 		// resize tag
 		resp.push(React.createElement(TaskLinkBoxButtonResize, {
 			data : data,
+			width : width,
+			height : height,
+			resize : this.handleResize,
+			sender : this,
 			key: data.id+'_tag_resize'
+		}));
+
+		// edit tag
+		resp.push(React.createElement(TaskLinkBoxButtonEdit,{
+			data : data,
+			width : width,
+			height : height,
+			key: data.id+'_tag_edit'
 		}));
 		return resp;
 	},
@@ -142,8 +161,12 @@ var TaskLinkBox = React.createClass({
 
 		var transform = 'translate('+this.state.x+', ' + this.state.y + ')';
 		taskDispatcher[data.id] = this;
+
 		if(this.needSavePosition){
 			this.savePosition();
+		}
+		if(this.needSaveSize){
+			this.saveSize();
 		}
 		
 		// prepare link line
@@ -152,8 +175,8 @@ var TaskLinkBox = React.createClass({
 			var previousData = this.state.previousData;
 			link_line = React.createElement('line', {
 				className : 'svg_link_line',
-				x1 : 100,
-				y1 : 60,
+				x1 : previousData.width,
+				y1 : previousData.height / 2,
 				x2 : this.state.x,
 				y2 : this.state.y + this.state.height / 2
 			});
@@ -161,6 +184,21 @@ var TaskLinkBox = React.createClass({
 
 		if(this.state.reload_sub_task){
 			this.loadTask();
+		}else{
+			var canEdit = this.state.canEdit;
+			var previousData = this.props.data;
+			previousData.width = width;
+			previousData.height = height;
+			var task_array = this.state.sub_task_array.map(function(task){
+				return React.createElement(TaskLinkBox, {
+					data:task,
+					x: task.x,
+					y: task.y,
+					canEdit : canEdit,
+					key: 'task_link_id_' + task.id,
+					previousData : previousData
+				});
+			});
 		}
 
 		var canEdit = this.props.canEdit;
@@ -176,7 +214,6 @@ var TaskLinkBox = React.createClass({
 		user_name = 'Assignee：\n' + user_name;
 		if(user_name.length * 6 > (width - text_padding)){
 			var len = (width - text_padding * 2) / 6
-			console.log(user_name.length * 8);
 			user_name = user_name.substr(0, len - 2) + '...';
 		}
 
@@ -186,7 +223,7 @@ var TaskLinkBox = React.createClass({
 				transform : transform,
 				key : data.id + '_g_box_body'
 			},
-			this.state.sub_tasks,
+			task_array,
 			// ---- content ----
 			// background
 			React.createElement('rect', {
@@ -215,25 +252,99 @@ var TaskLinkBox = React.createClass({
 	}
 });
 
-var TaskLinkBoxButtonResize = React.createClass({
+var TaskLinkBoxButtonEdit = React.createClass({
 	render : function(){
 		var data = this.props.data;
-		var width = 56;
+		var width = 24;
 		var height = 20;
-		return React.createElement('g', {
-				className : 'svg_new_tag_g',
-				key : data.id + '_g_resize_tag'
+
+		return React.createElement('g',{
+				className : 'svg_edit_tag_g',
+				key : data.id + '_g_edit_tag',
 			},
 			React.createElement('rect', {
-				className : 'svg_add_tag',
+				className : 'svg_edit_tag',
 	            width : width,
 	            height : height,
-				x: data.width - width,
-				y: data.height
+				x: 0,
+				y: this.props.height
 			}),
-			React.createElement('text', {
-				x: data.width - width + 5,
-				y: data.height + 16 }, 'Resize')
+			React.createElement('image',{
+				xlinkHref : url_icon_edit,
+				x: 0,
+				y: this.props.height + 2, 
+				width : 24,
+				height : 16
+			})
+		);
+	}
+})
+var TaskLinkBoxButtonResize = React.createClass({
+	handleMouseMove : function(e){
+		if(! this.inDragMode){
+			return
+		}
+		var width = this.props.width;
+		var height = this.props.height;
+		var diffX = e.pageX - this.actionX;
+		this.actionX = e.pageX;
+		if(diffX!=0){
+			width += diffX;
+		}
+		var diffY = e.pageY - this.actionY;
+		this.actionY = e.pageY;
+		if(diffY!=0){
+			height += diffY;
+		}
+		if(height<min_box_height){ height = min_box_height};
+		if(width<min_box_width){ width = min_box_width};
+		this.props.resize(width, height);
+	},
+	handleMouseDown : function(e){
+		this.inDragMode = true;
+		this.actionX = e.pageX;
+		this.actionY = e.pageY;
+	},
+	handleMouseUp : function(e){
+		this.inDragMode = false;
+		panelHandleMouseMove = false;
+		var sender = this.props.sender;
+		sender.needSaveSize = true;
+		sender.setState({
+			saveSize : true
+		})
+		panelHandleMouseUp = false;
+	},
+	handleMouseOut : function(e){
+		panelHandleMouseMove = this.handleMouseMove;
+		panelHandleMouseUp = this.handleMouseUp;
+	},
+	render : function(){
+		var data = this.props.data;
+		var width = 24;
+		var height = 20;
+		return React.createElement('g', {
+				className : 'svg_resize_tag_g',
+				key : data.id + '_g_resize_tag',
+				onMouseMove : this.handleMouseMove,
+				onMouseDown : this.handleMouseDown,
+				onMouseUp : this.handleMouseUp,
+				onMouseOut : this.handleMouseOut
+			},
+			React.createElement('rect', {
+				className : 'svg_resize_tag',
+	            width : width,
+	            height : height,
+				x: this.props.width - width,
+				y: this.props.height
+			}),
+			React.createElement('image',{
+				xlinkHref : url_icon_crop,
+				x: this.props.width - width,
+				y: this.props.height + 2, 
+				width : 24,
+				height : 16
+			})
 		);
 	}
 });
