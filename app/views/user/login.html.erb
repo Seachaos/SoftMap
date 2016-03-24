@@ -1,13 +1,38 @@
 <section>
-<%=flash[:login_msg]%>
-<%=form_for @user, :url=>{:action=>'login'} do |f| %>
+<%=form_for @user, :url=>{:action=>'login'}, :html=>{
+	:onsubmit => 'return mixPWD();',
+	:id => 'f1'
+} do |f| %>
 	<%=label_tag :account, 'Account' %><br /><%=f.text_field :account %><br />
 	<%=label_tag :password, 'Password' %><br /><%=f.password_field :password %><br />
+	<div id="login_msg" style="color:#00A;" ><%=flash[:login_msg]%></div>
 	<%= submit_tag 'Login', :class=>'button' %>
 	<% if SystemSetting.isRegisterPublic then %>
 		<hr />
 		<a href="<%=url_for :controller=>'user', :action=>'register' %>" class="button" >Register</a>
 	<% end %>
 <% end %>
+<script type="text/javascript">
+	var pwd_challenge = false;
+	function msg(str){
+		$('#login_msg').html(str);
+	}
+	function mixPWD(){
+		msg('Please wait...');
+		if(pwd_challenge){
+			return true;
+		}
+		apiCall('<%=url_for :action=>'get_challenge' %>', { account : $('#user_account').val() }, function(resp){
+			pwd_challenge = resp.hash;
+			key = resp.key;
+			pwd = $('#user_password').val();
+			pwd = Sha256.hash(pwd + pwd_challenge)
+			pwd = Sha256.hash(pwd + key)
+			$('#user_password').val(pwd);
+			$('#f1').submit();
+		});
+		return false;
+	}
+</script>
 
 </section>

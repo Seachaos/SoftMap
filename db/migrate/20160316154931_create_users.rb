@@ -7,6 +7,7 @@ class CreateUsers < ActiveRecord::Migration
       t.string :permission, :default=>'user'
       t.string :token
       t.string :mail
+      t.string :challenge
 
       t.timestamps null: false
     end
@@ -14,8 +15,9 @@ class CreateUsers < ActiveRecord::Migration
     # add default admin
     user = User.new
     user.account = 'admin'
-    user.password = 'admin'
     user.permission = 'admin'
+    user.challenge = User.createUUID
+    user.password = User.sha256('admin' + user.challenge)
     user.name = 'admin'
     user.save
   end
