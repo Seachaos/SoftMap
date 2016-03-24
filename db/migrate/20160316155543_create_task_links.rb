@@ -11,9 +11,8 @@ class CreateTaskLinks < ActiveRecord::Migration
       t.integer :board_id, :default=>10, :index=>true
       t.string :name
       t.string :description
-      t.string :state_str
       t.string :change_code
-      t.integer :state_int, :index=>true
+      t.integer :state_int, :index=>true, :default=>0
       t.integer :user_id, :index=>true
       t.integer :assignee_user_id, :index=>true
 

@@ -29,6 +29,7 @@
 	var panel_width = $('#task_panel').width();
 
 	var user_list = <%= @users.to_json.to_s.html_safe %>;
+	var state_list = <%= @states.to_json.to_s.html_safe %>;
 	var canEdit = <%=@canEdit%>;
 
 	$(document).ready(function(){

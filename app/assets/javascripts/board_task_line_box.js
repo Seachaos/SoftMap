@@ -239,6 +239,11 @@ var TaskLinkBox = React.createClass({
 			React.createElement('text', { x : text_padding, y : 36 }, data.name),
 			// description
 			React.createElement('text', { x : text_padding, y : 56 }, data.description),
+			// state
+			React.createElement('text', {
+				x : text_padding,
+				y : 76,
+				className : 'svg_text_assignee' }, state_list[data.state_int]),
 			// assignee_user
 			React.createElement('text', { x : text_padding,
 				y : height - text_padding,

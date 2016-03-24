@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160320144838) do
+ActiveRecord::Schema.define(version: 20160324162154) do
 
   create_table "board_permissions", force: :cascade do |t|
     t.integer  "board_id"
@@ -55,9 +55,8 @@ ActiveRecord::Schema.define(version: 20160320144838) do
     t.integer  "height",           default: 100
     t.string   "name"
     t.string   "description"
-    t.string   "state_str"
     t.string   "change_code"
-    t.integer  "state_int"
+    t.integer  "state_int",        default: 0
     t.integer  "user_id"
     t.integer  "assignee_user_id"
     t.datetime "created_at",                     null: false
@@ -70,6 +69,13 @@ ActiveRecord::Schema.define(version: 20160320144838) do
   add_index "task_links", ["previous_id"], name: "index_task_links_on_previous_id"
   add_index "task_links", ["state_int"], name: "index_task_links_on_state_int"
   add_index "task_links", ["user_id"], name: "index_task_links_on_user_id"
+
+  create_table "task_states", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "board_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "users", force: :cascade do |t|
     t.string   "name",       default: "No Name"

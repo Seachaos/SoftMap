@@ -26,7 +26,7 @@ class BoardController < ApplicationController
 			redirect_to :action=>:index
 			return
 		end
-
+		@states = TaskState.getStateJsonByBoardId(@board.id)
 		@users = false # list user for selector
 		@view_only = false
 		@view_only = true if params[:mode] == 'view_only'
@@ -40,6 +40,7 @@ class BoardController < ApplicationController
 			BoardPermission.where('board_id=?', @board.id).each do |permission|
 				user_ids.push(permission.user_id)
 			end
+			@users[@user.id] = 'Me'
 			User.where({:id => user_ids } ).each do |user|
 				@users[user.id] = user.name
 			end
