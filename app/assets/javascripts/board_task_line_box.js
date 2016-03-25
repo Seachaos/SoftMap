@@ -11,6 +11,7 @@ var TaskLinkBox = React.createClass({
 			canEdit : this.props.canEdit || false,
 			reload_sub_task : true,
 			data : this.props.data,
+			text_padding : 5,
 			previousData : this.props.previousData || false
 		}
 	},
@@ -158,7 +159,9 @@ var TaskLinkBox = React.createClass({
 		var data = this.state.data;
 		var height = this.state.height;
 		var width = this.state.width;
-		var text_padding = 10;
+		var text_padding = this.state.text_padding;
+
+
 		var text_width = width - text_padding * 2;
 
 		var transform = 'translate('+this.state.x+', ' + this.state.y + ')';
@@ -233,17 +236,12 @@ var TaskLinkBox = React.createClass({
 				width : width,
 				height : height
 			}),
-			// id
-			React.createElement('text', { x : text_padding, y : 16 }, '#'+data.id),
 			// name
-			React.createElement('text', { x : text_padding, y : 36 }, data.name),
+			React.createElement('text', { x : text_padding, y : 36, className:'svg_text_name' }, data.name),
 			// description
-			React.createElement('text', { x : text_padding, y : 56 }, data.description),
+			React.createElement('text', { x : text_padding, y : 56, className:'svg_text_description' }, data.description),
 			// state
-			React.createElement('text', {
-				x : text_padding,
-				y : 76,
-				className : 'svg_text_assignee' }, state_list[data.state_int]),
+			React.createElement(TaskLinkBoxState, {sender:this} ),
 			// assignee_user
 			React.createElement('text', { x : text_padding,
 				y : height - text_padding,
@@ -261,14 +259,67 @@ var TaskLinkBox = React.createClass({
 	}
 });
 
+var TaskLinkBoxState = React.createClass({
+	handleClick : function(){
+		if(!this.props.sender.state.canEdit){
+			return;
+		}
+		var data = this.props.sender.state.data;
+		showEditTaskDialog(data);
+	},
+	render : function(){
+		var padding = 5;
+		var data = this.props.sender.state.data;
+		var text_padding = this.props.sender.state.text_padding;
+		var text = state_list[data.state_int] || '';
+		if(data.state_int==0){
+			text = '';
+		}
+		var text_id = '#' + data.id
+		var width = text.length * 8 + 6;
+		var width_id = text_id.length * 8 + 6;
+		var height = 18;
+		var y = padding;
+		var x_id = padding;
+		var x = width_id + x_id + padding;
+
+		var rect_state = false;
+		if(text){
+			rect_state = React.createElement('g', {},
+				React.createElement('rect', {
+					x : x, y : y,
+					width : width, height : height,
+					rx : 6, ry:6,
+					className:'svg_state_tag'
+				}),
+				React.createElement('text', {
+				x : x+4,
+				y : y+14,
+				className : 'svg_text_assignee' }, text)
+			);
+		}
+		return React.createElement('g', { className:'svg_state_tag_g', onClick:this.handleClick },
+				// id
+				React.createElement('rect', {
+					x : x_id, y : y,
+					width : width_id, height : height,
+					rx : 6, ry:6,
+					className:'svg_state_tag'
+				}),
+					React.createElement('text', {
+					x : x_id+4,
+					y : y+14,
+					className : 'svg_text_assignee' }, text_id),
+				// state
+				rect_state
+			);
+	}
+});
+
 var TaskLinkBoxButtonEdit = React.createClass({
 	handleClick : function(){
 		var data = this.props.data;
-		showNewTaskDialog({
-			task_id : data.id,
-			previous_id : data.previous_id,
-			data : data
-		});
+		showEditTaskDialog(data);
 	},
 	render : function(){
 		var data = this.props.data;

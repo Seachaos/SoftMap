@@ -140,6 +140,15 @@ footer{
         fill:#666666;
     }
 
+
+    .svg_text_name{
+        font-weight:bold;
+        font-size : 14px;
+    }
+    .svg_text_description{
+        font-size : 14px;
+    }
+
     .svg_link_line{
         stroke:rgb(0,0,0);
         stroke-width:1;
@@ -188,6 +197,15 @@ footer{
             fill:rgb(235, 245, 255);
             stroke-width:1px;
             stroke:rgb(0,0,0);
+        }
+    }
+    .svg_state_tag_g{
+        cursor: pointer;
+
+        .svg_state_tag{
+            fill:rgb(245, 255, 245);
+            stroke-width:1px;
+            stroke:rgb(128,128,128);
         }
     }
 }

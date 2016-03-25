@@ -4,7 +4,7 @@ class TaskState < ActiveRecord::Base
 	end
 
 	def self.getStateJsonByBoardId(board_id)
-		resp = {}
+		resp = { '0' => 'None' }
 		TaskState.getStateByBoardId(board_id).each do |state|
 			resp[state.id] = state.name
 		end

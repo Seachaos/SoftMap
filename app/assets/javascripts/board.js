@@ -18,6 +18,15 @@ function showNewTaskDialog(opt){
 		document.getElementById('create_task_dialog'));
 }
 
+
+function showEditTaskDialog(data){
+	showNewTaskDialog({
+		task_id : data.id,
+		previous_id : data.previous_id,
+		data : data
+	});
+}
+
 var CreateTaskDialog = React.createClass({
 	saveTask : function(){
 		var data = {};

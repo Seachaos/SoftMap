@@ -27,6 +27,7 @@ class BoardController < ApplicationController
 			return
 		end
 		@states = TaskState.getStateJsonByBoardId(@board.id)
+
 		@users = false # list user for selector
 		@view_only = false
 		@view_only = true if params[:mode] == 'view_only'
