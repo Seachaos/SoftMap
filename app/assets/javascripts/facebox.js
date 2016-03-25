@@ -68,7 +68,7 @@
 (function($) {
 
   $.facebox_react = function(onReady) {
-    $.facebox.loading([])
+    $.facebox.loading_for_react([])
     $.facebox.reveal_for_react(onReady);
   }
 
@@ -122,7 +122,6 @@
       })
       $(document).trigger('loading.facebox')
     },
-
     reveal: function(data, klass) {
       $(document).trigger('beforeReveal.facebox')
       if (klass) $('#facebox .content').addClass(klass)
@@ -132,12 +131,29 @@
       $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
     },
 
+    // for react
+    loading_for_react: function() {
+      init()
+      if ($('#facebox .loading').length == 1) return true
+      showOverlay()
+      $('#facebox').show().css({
+        top:  getPageScroll()[1] + (getPageHeight() / 10),
+        left: $(window).width() / 2 - ($('#facebox .popup').outerWidth() / 2)
+      })
+
+      $(document).bind('keydown.facebox', function(e) {
+        if (e.keyCode == 27) $.facebox.close()
+        return true
+      })
+      $(document).trigger('loading.facebox')
+    },
+    // for react
     reveal_for_react: function(onReady) {
       var dom = $('<div />');
       $(document).trigger('beforeReveal.facebox')
       $('#facebox .content').empty().append(dom);
-      onReady(dom[0]);
       $('#facebox .popup').children().fadeIn('normal')
+      onReady(dom[0]);
       $('#facebox').css('left', $(window).width() / 2 - ($('#facebox .popup').outerWidth() / 2))
       $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
     },
@@ -178,8 +194,12 @@
 
   // called one time to setup facebox on this page
   function init(settings) {
-    if ($.facebox.settings.inited) return true
-    else $.facebox.settings.inited = true
+    if ($.facebox.settings.inited){
+      if($('#facebox').is('div')){
+        return true;
+      }
+    }
+    $.facebox.settings.inited = true
 
     $(document).trigger('init.facebox')
     makeCompatible()
