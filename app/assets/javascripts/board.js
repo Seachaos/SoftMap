@@ -11,11 +11,12 @@ function showNewTaskDialog(opt){
 	var opt = opt || {};
 	opt.key = uuid();
 
-	$.facebox('<div id="create_task_dialog" />');
-	ReactDOM.render(
-		React.createElement(CreateTaskDialog,
-			opt),
-		document.getElementById('create_task_dialog'));
+	$.facebox_react(function(dom){
+		ReactDOM.render(
+			React.createElement(CreateTaskDialog,
+				opt),
+			dom);
+	});
 }
 
 
@@ -84,9 +85,16 @@ var CreateTaskDialog = React.createClass({
 		return initData;
 	},
 	render : function(){
-		var title = null;
-		if(this.props.previous_name){
-			title = React.createElement('h3', {}, 'Sub task in :' + this.props.previous_name);
+		var title = React.createElement('h3', {}, 'New Task');
+		if(this.props.task_id){
+			title = React.createElement('h3', {}, 'Edit #' + this.props.task_id );
+		}
+		if(this.props.previous_id){
+			var text = '#' + this.props.previous_id;
+			if(this.props.previous_name){
+				text += ' ' + this.props.previous_name;
+			}
+			title = React.createElement('h3', {}, 'New Task In：' + text);
 		}
 		return React.createElement('div', {
 

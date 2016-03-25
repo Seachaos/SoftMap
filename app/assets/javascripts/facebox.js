@@ -66,6 +66,12 @@
  *
  */
 (function($) {
+
+  $.facebox_react = function(onReady) {
+    $.facebox.loading([])
+    $.facebox.reveal_for_react(onReady);
+  }
+
   $.facebox = function(data, klass) {
     $.facebox.loading(data.settings || [])
 
@@ -121,6 +127,16 @@
       $(document).trigger('beforeReveal.facebox')
       if (klass) $('#facebox .content').addClass(klass)
       $('#facebox .content').empty().append(data)
+      $('#facebox .popup').children().fadeIn('normal')
+      $('#facebox').css('left', $(window).width() / 2 - ($('#facebox .popup').outerWidth() / 2))
+      $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
+    },
+
+    reveal_for_react: function(onReady) {
+      var dom = $('<div />');
+      $(document).trigger('beforeReveal.facebox')
+      $('#facebox .content').empty().append(dom);
+      onReady(dom[0]);
       $('#facebox .popup').children().fadeIn('normal')
       $('#facebox').css('left', $(window).width() / 2 - ($('#facebox .popup').outerWidth() / 2))
       $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
