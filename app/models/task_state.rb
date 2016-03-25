@@ -10,4 +10,13 @@ class TaskState < ActiveRecord::Base
 		end
 		return resp
 	end
+
+	def self.insertState(board_id, name)
+		state = TaskState.new
+		state.board_id = board_id
+		state.name = name
+		return false unless state.save
+		return state.id
+	end
+
 end
