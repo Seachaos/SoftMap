@@ -126,6 +126,20 @@ var NewTask = React.createClass({
 	}
 });
 
+var GoOrigin = React.createClass({
+	handleClick : function(){
+		taskPanel.setState({
+			x:0, y:0, goCenter:true
+		});
+	},
+	render : function(){
+		return React.createElement('span',{
+			className:'button',
+			onClick:this.handleClick
+		}, 'Go Origin');
+	}
+});
+
 function createInput(label, name, sender, option){
 	var handleChange = function(e){
 		var obj = {};

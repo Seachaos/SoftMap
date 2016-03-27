@@ -3,9 +3,9 @@
 	<hr />
 	<div id="controlBar">
 		<% if @view_only and @permissionEdit then %>
-			<a href="<%=url_for :mode=>:edit_mode %>" class="button" >Edit Mode</a>
+			<a jhref="<%=url_for :mode=>:edit_mode %>" class="button" >Edit Mode</a>
 		<% elsif @permissionEdit %>
-			<a href="<%=url_for :mode=>:view_only %>" class="button" >View Mode</a>
+			<a jhref="<%=url_for :mode=>:view_only %>" class="button" >View Mode</a>
 		<% end %>
 		<span id="reactNewTaskArea" ></span>
 		<% if @permissionSetting then %>
@@ -43,10 +43,28 @@
 		}
 		$(window).resize(onResize)
 		onResize();
+		var newTask = false;
 		if(canEdit){
-			ReactDOM.render(React.createElement(NewTask), document.getElementById('reactNewTaskArea'));
+			newTask = React.createElement(NewTask);
 		}
-		ReactDOM.render(React.createElement(TaskPanel, {canEdit:canEdit} ), document.getElementById('task_panel'));
+		ReactDOM.render(React.createElement('span', {},
+				newTask,
+				React.createElement(GoOrigin)
+				), document.getElementById('reactNewTaskArea'));
+
+		var urlHash = getURLHash();
+		console.log(urlHash);
+		ReactDOM.render(React.createElement(TaskPanel, {
+			canEdit:canEdit,
+			x : urlHash.x || 0,
+			y : urlHash.y || 0
+		} ), document.getElementById('task_panel'));
 	})
+
+	$('[jhref]').click(function(){
+		var href = $(this).attr('jhref');
+		href += window.location.hash;
+		window.location.href = href;
+	});
 	</script>
 </section>

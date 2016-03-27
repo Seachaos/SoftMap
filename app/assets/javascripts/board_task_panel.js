@@ -57,6 +57,7 @@ var TaskPanel = React.createClass({
 		if(panelHandleMouseUp){
 			panelHandleMouseUp(e);
 		}
+		this.updateURLHash();
 	},
 	handleMouseOut : function(e){
 		// panelHandleMouseMove = false;
@@ -79,6 +80,12 @@ var TaskPanel = React.createClass({
 			onWindowsSizeChange : true
 		});
 	},
+	updateURLHash : function(){
+		setURLHash({
+			x : this.state.x,
+			y : this.state.y
+		})
+	},
 	getInitialState : function(){
 		$(window).resize(this.onWindowSizeChange);
 		$(window).keydown(this.handleKeydown);
@@ -87,8 +94,8 @@ var TaskPanel = React.createClass({
 		return {
 			canEdit : this.props.canEdit || false,
 			loading : true,
-			x : 0,
-			y : 0
+			x : this.props.x || 0,
+			y : this.props.y || 0
 		};
 	},
 	render : function(){

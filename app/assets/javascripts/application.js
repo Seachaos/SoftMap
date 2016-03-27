@@ -58,3 +58,25 @@ function uuid(){
 	return guid();
 }
 
+var _urlHashCache = false;
+function getURLHash(){
+	var obj = {};
+	try{
+		var hash = window.location.hash;
+		hash = hash.substring(1, hash.length);
+		obj = jQuery.parseJSON(hash);
+		if(!obj){ obj = {}; };
+	}catch(e){ }
+	return obj;
+}
+
+function setURLHash(dict){
+	var obj = _urlHashCache || getURLHash();
+	for(i in dict){
+		obj[i] = dict[i];
+	}
+	_urlHashCache = obj;
+	window.location.hash = JSON.stringify(obj)
+}
+
+
