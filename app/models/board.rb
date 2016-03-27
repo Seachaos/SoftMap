@@ -25,7 +25,7 @@ class Board < ActiveRecord::Base
 	end
 
 	def self.getOwnBoards(user)
-		permissions = BoardPermission.where('user_id=?', user.id)
+		permissions = BoardPermission.where('user_id=? and permission!=?', user.id, 'None')
 		array = []
 		permissions.each do |permission|
 			array.push permission.board_id
@@ -37,30 +37,34 @@ class Board < ActiveRecord::Base
 		return self.public_state == 0
 	end
 
+	def isPublic
+		self.public_state === 2
+	end
+
 	def permissionForView(user)
-		return true if self.public_state === 2
-		checkPermissionExists user, 'Creator'
+		return true if isPublic
+		checkPermissionExists user, ['Creator', 'Editor', 'Viewer']
 	end
 
 	def permissionForEdit(user)
 		if user.present? then
-			return true if self.public_state === 2
+			return true if isPublic
 		end
-		checkPermissionExists user, 'Creator'
+		checkPermissionExists user, ['Creator', 'Editor']
 	end
 
-	def permissionForInvitedPeople(user)
-		return false unless self.public_state == 0
-		checkPermissionExists user, 'Creator'
+	def permissionForSetting(user)
+		# return false unless self.public_state == 0
+		checkPermissionExists user, ['Creator']
 	end
 protected
 	
-	def checkPermissionExists(user, name)
+	def checkPermissionExists(user, checks)
 		return false unless user.present?
 
 		permission = BoardPermission.where('board_id=? and user_id=?', self.id, user.id).first
 		return false unless permission.present?
-		return true if permission.permission.include? name
+		return true if checks.include? permission.permission
 		return false
 	end
 end

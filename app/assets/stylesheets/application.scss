@@ -119,6 +119,10 @@ section{
     }
 }
 
+.clear{
+    clear:both;
+}
+
 @mixin svg_tag_group{
     font-size : 15px;
     fill:rgb(64,64,64);

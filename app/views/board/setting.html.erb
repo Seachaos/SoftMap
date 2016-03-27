@@ -1,0 +1,111 @@
+<section>
+	<h1><%=@board.name%> - Setting</h1>
+	<hr />
+
+	<h3>Invited</h3>
+	<div style="float:left;" >
+		This board user (click to modify)：<br />
+		<div id="board_user" ></div >
+	</div>
+	<div style="float:right;" >
+		Another user (click to modify)：<br />
+		<div id="another_user" ></div >
+	</div>
+	<div class="clear" ></div>
+</section>
+
+<script type="text/javascript">
+
+function createInputVal(name, val){
+	var resp = $('<input />');
+	resp.attr('name', name);
+	resp.attr('value', val);
+	return resp;
+}
+
+var PermissionSettingPanel = React.createClass({
+	handleClickSave : function(){
+		var f = $('<form method="post" />');
+		f.append(createInputVal('<%=request_forgery_protection_token.to_s%>', '<%= form_authenticity_token %>'));
+		f.append(createInputVal('permission', this.permission));
+		f.append(createInputVal('user_id', this.props.user.id));
+		f.append(createInputVal('post_action', 'save'));
+		f.submit();
+	},
+	handleChangePermission : function(e){
+		this.permission = e.target.value;
+	},
+	render : function(){
+		var user = this.props.user;
+		var firstPermission = false;
+		var pdict = {
+			'Viewer' : 'Viewer',
+			'Editor' : 'Editor',
+			'Creator' : 'Creator',
+			'None' : 'None'
+		};
+		
+		var permissionSetOptions = [];
+		for(key in pdict){
+			var name = pdict[key];
+			if(!firstPermission){
+				firstPermission = key;
+			}
+			permissionSetOptions.push(React.createElement('option', {
+				value : key,
+				key : '_psp_opt_' + key
+			}, name));
+		}
+		this.permission = user.board_permission || firstPermission;
+		var permissionSet = React.createElement('select', {
+				defaultValue : this.permission,
+				onChange : this.handleChangePermission
+			}, permissionSetOptions);
+
+		return React.createElement('div',{},
+			React.createElement('h1', {}, 'Set: ' +user.name),
+			permissionSet,
+			React.createElement('span',{
+				className : 'button_small',
+				onClick : this.handleClickSave
+			}, 'Save')
+		);
+	}
+});
+
+var UserPermission = React.createClass({
+	handleClick : function(){
+		var user = this.props.user;
+		$.facebox_react(function(dom){
+			ReactDOM.render(React.createElement(PermissionSettingPanel, {user: user}), dom);
+		});
+	},
+	render: function(){
+		var user = this.props.user;
+		var permission = false;
+		if(user.board_permission){
+			permission = ' (' + user.board_permission + ')'
+		}
+		return React.createElement('div', {
+				onClick : this.handleClick
+			},
+			React.createElement('div', { className:'button_small'} ,
+			user.name, permission)
+		);
+	}
+});
+var BoardUser = React.createClass({
+	render: function(){
+		var options = this.props.users.map(function(user){
+			return React.createElement(UserPermission, {user:user, key:'_bu_up_'+user.id}, user.name) ;
+		});
+		if(options.length<1){
+			options = React.createElement('b', {},'No user can select');
+		}
+		return React.createElement('div', {},
+			options);
+	}
+})
+ReactDOM.render(React.createElement(BoardUser, {users : <%=@users.to_json.to_s.html_safe%> }), document.getElementById('board_user'));
+ReactDOM.render(React.createElement(BoardUser, {users : <%=@allUsers.to_json.to_s.html_safe%> }), document.getElementById('another_user'));
+</script>

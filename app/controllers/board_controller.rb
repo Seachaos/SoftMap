@@ -14,18 +14,9 @@ class BoardController < ApplicationController
 	end
 
 	def view
-		@board = Board.find_by_id(params[:id])
-		unless @board.present? then
-			redirect_to :action=>:index
-			return
-		end
+		return unless has_board_select
+		return unless check_pass @board.permissionForView(@user), 'Access deny'
 		
-		# check permission for view
-		unless @board.permissionForView(@user)
-			flash[:error] = 'Access deny'
-			redirect_to :action=>:index
-			return
-		end
 		@states = TaskState.getStateJsonByBoardId(@board.id)
 
 		@users = false # list user for selector
@@ -36,18 +27,15 @@ class BoardController < ApplicationController
 		@canEdit = false # control edit mode
 
 		if @board.permissionForEdit(@user) then
-			user_ids = []
 			@users = {}
-			BoardPermission.where('board_id=?', @board.id).each do |permission|
-				user_ids.push(permission.user_id)
-			end
-			@users[@user.id] = 'Me'
-			User.where({:id => user_ids } ).each do |user|
+			@users[0] = 'Me'
+			BoardPermission.getUsersByBoardId(@board.id).each do |user|
 				@users[user.id] = user.name
 			end
 
 			@permissionEdit = true
 			@canEdit = true unless @view_only
+			@permissionSetting = @board.permissionForSetting(@user)
 		end
 
 	end
@@ -64,14 +52,54 @@ class BoardController < ApplicationController
 		@board.save
 
 		# set permission
-		permission = BoardPermission.new
-		permission.board_id = @board.id
-		permission.user_id = @user.id
-		permission.permission = 'Creator'
-		permission.save
+		BoardPermission.setBoardPermission @user.id, @board.id, 'Creator'
 
 		flash[:msg] = 'Board save success'
 		redirect_to :action=>:index
+	end
+
+	def setting
+		return unless has_board_select
+		return unless check_pass @board.permissionForSetting(@user), 'Access deny'
+
+		if params[:post_action]=='save' then
+			BoardPermission.setBoardPermission(params[:user_id], @board.id, params[:permission])
+		end
+
+		exists_user = {}
+		@users = BoardPermission.getUsersByBoardId(@board.id).map{ |user|
+			exists_user[user.id] = true unless user.board_permission != 'None'
+			{
+				:id=>user.id, :name=>user.name, :board_permission => user.board_permission
+			}
+		}
+		@allUsers = User.all.map{ |user|
+			{
+				:id=>user.id, :name=>user.name
+			}
+		}.select{ |user| 
+			!(exists_user.include? user[:id])
+		}
+	end
+
+protected
+
+	def has_board_select()
+		@board = Board.find_by_id(params[:id])
+		unless @board.present? then
+			redirect_to :action=>:index
+			return false
+		end
+		return true
+	end
+
+	def check_pass(value, message = nil)
+		unless value then
+			flash[:error] = message
+			redirect_to :action=>:index
+			return false
+		end
+		return true
 	end
 
 	def boardFromParams(params)

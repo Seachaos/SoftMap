@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+	attr_accessor :board_permission
+
 	def self.createUUID()
 		return User.sha256(SecureRandom.urlsafe_base64 + SecureRandom.urlsafe_base64)
 	end
