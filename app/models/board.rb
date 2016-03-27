@@ -25,7 +25,7 @@ class Board < ActiveRecord::Base
 	end
 
 	def self.getOwnBoards(user)
-		permissions = BoardPermission.where('user_id=? and permission!=?', user.id, 'None')
+		permissions = BoardPermission.where('user_id=?', user.id)
 		array = []
 		permissions.each do |permission|
 			array.push permission.board_id

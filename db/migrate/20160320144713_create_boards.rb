@@ -3,6 +3,7 @@ class CreateBoards < ActiveRecord::Migration
     create_table :boards do |t|
       t.string :name
       t.integer :public_state, :default=>0, :index=>true
+      t.integer :creator_id, :default=>0, :index=>true
       t.string :description
 
       t.timestamps null: false

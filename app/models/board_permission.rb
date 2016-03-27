@@ -31,4 +31,14 @@ class BoardPermission < ActiveRecord::Base
 		permission.permission = text
 		permission.save
 	end
+
+	def self.checkBoardPermissionChangeWillHasError(user_id, board, text)
+		permission = BoardPermission.where('board_id=? and user_id=?', board.id, user_id).first
+		return false unless permission.present?
+		if permission.permission == 'Creator' then
+			permissions = BoardPermission.where('board_id=? and permission=?', board.id, 'Creator')
+			return "If only one Creator, You can't change it" if permissions.size == 1
+		end
+		return false
+	end
 end

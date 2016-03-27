@@ -48,6 +48,7 @@ class BoardController < ApplicationController
 		end
 		unless @board.present?
 			@board = Board.new(boardFromParams(params))
+			@board.creator_id = @user.id
 		end
 		@board.save
 
@@ -63,12 +64,25 @@ class BoardController < ApplicationController
 		return unless check_pass @board.permissionForSetting(@user), 'Access deny'
 
 		if params[:post_action]=='save' then
-			BoardPermission.setBoardPermission(params[:user_id], @board.id, params[:permission])
+			error = BoardPermission.checkBoardPermissionChangeWillHasError(params[:user_id], @board, params[:permission])
+			unless error then
+				if BoardPermission.setBoardPermission(params[:user_id], @board.id, params[:permission]) then
+					flash[:msg] = 'Set Permission success'
+				else
+					flash[:error] = 'Set Permission Failed'
+				end
+				redirect_to :id=>@board.id
+				return
+			else
+				flash[:error] = error
+				redirect_to :id=>@board.id
+				return
+			end
 		end
 
 		exists_user = {}
 		@users = BoardPermission.getUsersByBoardId(@board.id).map{ |user|
-			exists_user[user.id] = true unless user.board_permission != 'None'
+			exists_user[user.id] = true
 			{
 				:id=>user.id, :name=>user.name, :board_permission => user.board_permission
 			}

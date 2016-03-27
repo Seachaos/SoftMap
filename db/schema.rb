@@ -24,11 +24,13 @@ ActiveRecord::Schema.define(version: 20160324162154) do
   create_table "boards", force: :cascade do |t|
     t.string   "name"
     t.integer  "public_state", default: 0
+    t.integer  "creator_id",   default: 0
     t.string   "description"
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
   end
 
+  add_index "boards", ["creator_id"], name: "index_boards_on_creator_id"
   add_index "boards", ["public_state"], name: "index_boards_on_public_state"
 
   create_table "error_codes", force: :cascade do |t|

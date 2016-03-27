@@ -1,7 +1,7 @@
 <section>
 	<h1><%=@board.name%> - Setting</h1>
 	<hr />
-
+	<%=render :template=>'layouts/_message'%>
 	<h3>Invited</h3>
 	<div style="float:left;" >
 		This board user (click to modify)：<br />
@@ -44,7 +44,7 @@ var PermissionSettingPanel = React.createClass({
 			'Creator' : 'Creator',
 			'None' : 'None'
 		};
-		
+
 		var permissionSetOptions = [];
 		for(key in pdict){
 			var name = pdict[key];
