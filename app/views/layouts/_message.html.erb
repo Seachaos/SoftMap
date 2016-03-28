@@ -1,4 +1,7 @@
-<div>
+<div><%
+flash[:msg] = flash[:message] unless flash[:msg].present?
+flash[:error] = flash[:err] unless flash[:error].present?
+%>
 	<span style="color:#F00;"><%=flash[:error]%></span>
 	<span style="color:#0A0;"><%=flash[:msg]%></span>
 </div>

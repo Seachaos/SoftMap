@@ -1,0 +1,16 @@
+<section>
+	<h1>System Setting</h1>
+	<%=render :template=>'layouts/_message'%>
+
+	<div class="box_small"><%=form_tag do %>
+		<label>Register State:
+			<select name="register_state">
+				<option value="open" <%=is_select(@isRegisterPublic) %> >Public (for every one)</option>
+				<option value="close" <%=is_select_unless(@isRegisterPublic) %> >Private (only create by Administrator)</option>
+			</select>
+		</label>
+		<%=render_admin_key%>
+		<input type="submit" value="Save" class="button_small" />
+	<% end %></div>
+
+</section>

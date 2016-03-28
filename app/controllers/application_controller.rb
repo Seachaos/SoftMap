@@ -31,6 +31,7 @@ protected
       @user = nil
       return false
     end
+    @isAdmin = @user.isAdmin
     return true
   end
 
@@ -45,7 +46,7 @@ protected
 
   def require_admin
   	return false unless require_login
-  	unless @user.permission.include? "admin" then
+  	unless @user.isAdmin then
   		goto_login_page
   		return false
   	end

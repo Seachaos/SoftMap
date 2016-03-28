@@ -20,6 +20,9 @@ end
 	<% if @isLogin then %>
 		<%=text_menu('Boards', :controller=>'board', :action=>'index').html_safe %>
 		<%=text_menu('Logout', :controller=>'user', :action=>'logout').html_safe %>
+		<% if @isAdmin then %>
+			<%=text_menu('SystemSetting', :controller=>'admin' ).html_safe %>
+		<% end %>
 	<% else %>
 		<%=text_menu('Boards', :controller=>'board', :action=>'index').html_safe %>
 		<%=text_menu('Login', :controller=>'user', :action=>'login').html_safe %>

@@ -65,6 +65,7 @@ class UserController < ApplicationController
 
 	def create
 		unless SystemSetting.isRegisterPublic then
+			flash[:error] = 'Not allow register'
 			redirect_to :controller=>'user', :action=>'login'
 			return
 		end

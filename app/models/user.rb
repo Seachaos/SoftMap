@@ -11,4 +11,10 @@ class User < ActiveRecord::Base
 		resp.to_s
 	end
 
+	def isAdmin
+		return false unless self.permission.present?
+		return true if self.permission.include? 'admin'
+		return false
+	end
+
 end

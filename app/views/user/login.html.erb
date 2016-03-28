@@ -1,4 +1,5 @@
 <section>
+<%=render :template=>'layouts/_message'%>
 <%=form_for @user, :url=>{:action=>'login'}, :html=>{
 	:onsubmit => 'return mixPWD();',
 	:id => 'f1'
