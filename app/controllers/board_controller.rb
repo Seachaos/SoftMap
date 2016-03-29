@@ -13,6 +13,14 @@ class BoardController < ApplicationController
 		@board = Board.new
 	end
 
+	def list
+		return unless has_board_select
+		return unless check_pass @board.permissionForView(@user), 'Access deny'
+		@tasks = TaskLink.where('previous_id = ? and board_id = ?', 0, @board.id ).map{ |task|
+			get_task_list(task);
+		}
+	end
+
 	def view
 		return unless has_board_select
 		return unless check_pass @board.permissionForView(@user), 'Access deny'
@@ -97,6 +105,16 @@ class BoardController < ApplicationController
 	end
 
 protected
+
+	def get_task_list (task)
+		subs = TaskLink.where('previous_id = ? and board_id = ?', task.id, task.board_id ).map { |sub|
+			get_task_list(sub)
+		}
+		return {
+			:task => task,
+			:subs => subs
+		}
+	end
 
 	def has_board_select()
 		@board = Board.find_by_id(params[:id])

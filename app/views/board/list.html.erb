@@ -1,0 +1,34 @@
+<section>
+	<h1>Board List：<%=@board.name%></h1>
+	<hr />
+	<%=render :template=>'board/_control_bar' %>
+	<div id="listPanelArea" ></div>
+	<script type="text/javascript">
+	var ListPanel = React.createClass({
+		getInitialState : function(){
+			return {
+				datas : <%=@tasks.to_json.to_s.html_safe%>
+			}
+		},
+		renderList : function(datas){
+			var task = datas.task;
+			var sub_list = false;
+			if(datas.subs.length>0){
+				sub_list = React.createElement('ul', { style:{paddingLeft:'2em', margin:'0.7em'} }, datas.subs.map(this.renderList));
+			}
+			return React.createElement('li', {
+					key:'_list_task_id_'+task.id
+				},
+				task.name,
+				sub_list);
+		},
+		render: function(){
+			var lists = this.state.datas.map(this.renderList);
+			return React.createElement('ul', {},
+				lists
+				);
+		}
+	});
+	ReactDOM.render(React.createElement(ListPanel), document.getElementById('listPanelArea'));
+	</script>
+</section>
